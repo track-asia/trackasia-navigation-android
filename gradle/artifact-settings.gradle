@@ -1,17 +1,14 @@
 ext {
-    trackAsiaArtifactGroupId = 'io.github.track-asia'
-    trackAsiaArtifactId = project.hasProperty('POM_ARTIFACT_ID') ? project.property('POM_ARTIFACT_ID') : System.getenv('POM_ARTIFACT_ID')
-    trackAsiaArtifactTitle = 'Trackasia Navigation Android Utilities'
-    trackAsiaArtifactDescription = project.hasProperty('POM_DESCRIPTION') ? project.property('POM_DESCRIPTION') : System.getenv('POM_DESCRIPTION')
-    trackAsiaDeveloperName = 'Trackasia'
-    trackAsiaDeveloperEmail = 'trackasia@track-asia.com'
-    trackAsiaDeveloperOrganization = 'Trackasia'
-    trackAsiaDeveloperOrganizationUrl = 'http://www.track-asia.com'
-    trackAsiaDeveloperId = 'trackasia'
-    trackAsiaArtifactUrl = 'https://github.com/track-asia/trackasia-navigation-android'
-    trackAsiaArtifactVcsUrl = 'https://github.com/track-asia/trackasia-navigation-android.git'
-    trackAsiaArtifactScmUrl = 'scm:git@github.com:track-asia/trackasia-navigation-android.git'
-    trackAsiaArtifactLicenseName = 'The Apache Software License, Version 2.0'
-    trackAsiaArtifactLicenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    versionName = "1.0.9"
+    navigationArtifactGroupId = 'io.github.track-asia'
+    navigationArtifactId = 'android'
+    navigationArtifactTitle = 'TrackAsia Navigation SDK for Android'
+    navigationArtifactDescription = 'TrackAsia Navigation SDK for Android'
+    navigationDeveloperName = 'TrackAsia'
+    navigationDeveloperId = 'trackasia'
+    navigationDeveloperMail = 'trackasia@track-asia.com'
+    navigationArtifactUrl = 'https://github.com/track-asia/trackasia-navigation-android'
+    navigationArtifactScmUrl = 'scm:git@github.com:trackasia/trackasia-navigation-android.git'
+    navigationArtifactLicenseName = 'MIT'
+    navigationArtifactLicenseUrl = 'https://opensource.org/license/MIT'
+    versionName = project.hasProperty('VERSION_NAME') ? project.property('VERSION_NAME') : System.getenv('VERSION_NAME')
 }

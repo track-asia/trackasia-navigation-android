@@ -1,7 +1,21 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
+apply plugin: 'kotlinx-serialization'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
 
 android {
+    namespace 'com.trackasia.navigation.android.navigation'
+
     compileSdkVersion androidVersions.compileSdkVersion
     buildToolsVersion androidVersions.buildToolsVersion
 
@@ -11,13 +25,13 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField('String',
-                "MAPBOX_NAVIGATION_SDK_IDENTIFIER", String.format("\"%s\"", "trackasia-navigation-android")
+                "TRACKASIA_NAVIGATION_SDK_IDENTIFIER", String.format("\"%s\"", "trackasia-navigation-android")
         )
         buildConfigField('String',
-                "MAPBOX_NAVIGATION_VERSION_NAME", String.format("\"%s\"", project.VERSION_NAME)
+                "TRACKASIA_NAVIGATION_VERSION_NAME", String.format("\"%s\"", project.VERSION_NAME)
         )
         buildConfigField "String",
-                "MAPBOX_NAVIGATION_EVENTS_USER_AGENT", String.format("\"trackasia-navigation-android/%s\"",
+                "TRACKASIA_NAVIGATION_EVENTS_USER_AGENT", String.format("\"trackasia-navigation-android/%s\"",
                 project.VERSION_NAME
         )
         consumerProguardFiles 'proguard-consumer.pro'
@@ -33,19 +47,29 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
-    api dependenciesList.trackAsiaServices
     api dependenciesList.trackAsiaTurf
-    implementation(dependenciesList.trackAsia){
-        exclude group: 'io.github.track-asia', module: 'mapbox-sdk-geojson'
-        exclude group: 'io.github.track-asia', module: 'mapbox-sdk-turf'
-    }
+    implementation dependenciesList.trackAsia
+
+    implementation dependenciesList.androidxCore
+    implementation dependenciesList.kotlinstdlib
 
     compileOnly dependenciesList.gmsLocation
 
@@ -56,26 +80,20 @@ dependencies {
     // Logging
     implementation dependenciesList.timber
 
-    // AutoValues
-    annotationProcessor dependenciesList.autoValue
-    compileOnly dependenciesList.autoValueAnnotations
-    compileOnly dependenciesList.autoValueGson
-    annotationProcessor(dependenciesList.autoValueGson)
-
+    implementation dependenciesList.kotlinxSerializationJson
+    
     // Unit testing
     testImplementation dependenciesList.junit
-    testImplementation dependenciesList.mockito
     testImplementation dependenciesList.hamcrest
     testImplementation dependenciesList.commonsIO
     testImplementation dependenciesList.robolectric
-    implementation dependenciesList.androidxCore
-    implementation dependenciesList.kotlinstdlib
+    testImplementation dependenciesList.androidxTestKtx
+    testImplementation dependenciesList.mockk
 }
 
 apply from: 'javadoc.gradle'
+apply from: "${rootDir}/gradle/mvn-push-android.gradle"
 apply from: "${rootDir}/gradle/checkstyle.gradle"
 apply from: "${rootDir}/gradle/dependencies-graph.gradle"
 apply from: "${rootDir}/gradle/dependency-updates.gradle"
-repositories {
-    mavenCentral()
-}
+

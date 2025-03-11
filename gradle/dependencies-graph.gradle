@@ -17,13 +17,13 @@ import com.vanniktech.dependency.graph.generator.dot.Style
 
 plugins.apply(DependencyGraphGeneratorPlugin)
 
-def mapboxGenerator = new Generator(
-        "mapboxLibraries", // Suffix for our Gradle task.
+def trackAsiaGenerator = new Generator(
+        "trackAsiaLibraries", // Suffix for our Gradle task.
         "", // Root suffix that we don't want in this case.
-        { dependency -> dependency.getModuleGroup().startsWith("com.mapbox.mapboxsdk") }, // Only want Mapbox libs.
+        { dependency -> dependency.getModuleGroup().startsWith("com.trackasia") }, // Only want TrackAsia libs.
         { dependency -> true }, // Include transitive dependencies.
 )
 
 dependencyGraphGenerator {
-    generators = [mapboxGenerator]
+    generators = [trackAsiaGenerator]
 }

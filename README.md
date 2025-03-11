@@ -57,7 +57,7 @@ Step 1. Add it to your root `build.gradle` at the end of repositories:
 ```
 Step 2. Add the dependency
 ```
-  implementation 'com.github.trackasia:trackasia-navigation-android:3.0.0'
+  implementation 'com.github.trackasia:trackasia-navigation-android:4.0.0'
 ```
 
 ### Maven
@@ -75,7 +75,7 @@ Step 2. Add the dependency
   <dependency>
 	    <groupId>com.github.trackasia</groupId>
 	    <artifactId>trackasia-navigation-android</artifactId>
-	    <version>3.0.0</version>
+	    <version>4.0.0</version>
 	</dependency>
 ```
 
@@ -86,7 +86,7 @@ Step 1. Add it in your `build.sbt` at the end of resolvers:
 ```
 Step 2. Add the dependency
 ```
-  libraryDependencies += "com.github.trackasia" % "trackasia-navigation-android" % "3.0.0"
+  libraryDependencies += "com.github.trackasia" % "trackasia-navigation-android" % "4.0.0"
 ```
 
 ### leiningen
@@ -96,7 +96,7 @@ Step 1. Add it in your `project.clj` at the end of repositories:
 ```
 Step 2. Add the dependency
 ```
-  :dependencies [[com.github.trackasia/trackasia-navigation-android "3.0.0"]]	
+  :dependencies [[com.github.trackasia/trackasia-navigation-android "4.0.0"]]	
 ```
 
 To run the [sample code](#sample-code) on a device or emulator, include your [Mapbox access token](https://www.mapbox.com/help/define-access-token/) and map tile provider URL in `developer-config.xml` found in the project. 
@@ -108,7 +108,7 @@ To run the [sample code](#sample-code) on a device or emulator, include your [Ma
 
 ### <a name="sample-code">Sample code
 
-We've added one [navigation example](https://github.com/track-asia/trackasia-navigation-android/tree/main/app/src/main/java/com/mapbox/services/android/navigation/testapp/) to this repo's test app. We are planning to add more to help you get started with the SDK and to inspire you.
+We've added some [examples](https://github.com/track-asia/trackasia-navigation-android/tree/main/app/src/main/java/org/track-asia/navigation/android/example) to this repo's test app. We are planning to add more to help you get started with the SDK and to inspire you.
 
 In order to see the map or calculate a route you need your own Maptile and Direction services.
 
