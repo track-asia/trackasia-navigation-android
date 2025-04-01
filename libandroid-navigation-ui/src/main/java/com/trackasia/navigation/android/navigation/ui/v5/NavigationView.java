@@ -3,7 +3,6 @@ package com.trackasia.navigation.android.navigation.ui.v5;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -31,8 +30,9 @@ import com.trackasia.navigation.android.navigation.ui.v5.map.NavigationTrackAsia
 import com.trackasia.navigation.android.navigation.ui.v5.map.NavigationTrackAsiaMapInstanceState;
 import com.trackasia.navigation.android.navigation.ui.v5.map.WayNameView;
 import com.trackasia.navigation.android.navigation.ui.v5.summary.SummaryBottomSheet;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteOptions;
 import com.trackasia.geojson.Point;
 import com.trackasia.android.camera.CameraPosition;
 import com.trackasia.android.location.modes.RenderMode;
@@ -41,13 +41,12 @@ import com.trackasia.android.maps.TrackAsiaMap;
 import com.trackasia.android.maps.OnMapReadyCallback;
 import com.trackasia.android.maps.Style;
 import com.trackasia.navigation.android.navigation.ui.v5.instruction.InstructionView;
-import com.trackasia.navigation.android.navigation.v5.location.replay.ReplayRouteLocationEngine;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
-import com.trackasia.navigation.android.navigation.v5.utils.LocaleUtils;
+import com.trackasia.navigation.core.location.replay.ReplayRouteLocationEngine;
+import com.trackasia.navigation.core.models.UnitType;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.LocaleUtils;
 
 /**
  * View that creates the drop-in UI.
@@ -651,16 +650,16 @@ public class NavigationView extends CoordinatorLayout implements LifecycleOwner,
   }
 
   private void establishDistanceFormatter(LocaleUtils localeUtils, NavigationViewOptions options) {
-    String unitType = establishUnitType(localeUtils, options);
+    UnitType unitType = establishUnitType(localeUtils, options);
     String language = establishLanguage(localeUtils, options);
-    int roundingIncrement = establishRoundingIncrement(options);
+    TrackAsiaNavigationOptions.RoundingIncrement roundingIncrement = establishRoundingIncrement(options);
     DistanceFormatter distanceFormatter = new DistanceFormatter(getContext(), language, unitType, roundingIncrement);
 
     instructionView.setDistanceFormatter(distanceFormatter);
     summaryBottomSheet.setDistanceFormatter(distanceFormatter);
   }
 
-  private int establishRoundingIncrement(NavigationViewOptions navigationViewOptions) {
+  private TrackAsiaNavigationOptions.RoundingIncrement establishRoundingIncrement(NavigationViewOptions navigationViewOptions) {
     TrackAsiaNavigationOptions trackAsiaNavigationOptions = navigationViewOptions.navigationOptions();
     return trackAsiaNavigationOptions.getRoundingIncrement();
   }
@@ -669,9 +668,9 @@ public class NavigationView extends CoordinatorLayout implements LifecycleOwner,
     return localeUtils.getNonEmptyLanguage(getContext(), options.directionsRoute().getVoiceLanguage());
   }
 
-  private String establishUnitType(LocaleUtils localeUtils, NavigationViewOptions options) {
+  private UnitType establishUnitType(LocaleUtils localeUtils, NavigationViewOptions options) {
     RouteOptions routeOptions = options.directionsRoute().getRouteOptions();
-    String voiceUnits = routeOptions == null ? null : routeOptions.getVoiceUnits();
+    UnitType voiceUnits = routeOptions == null ? null : routeOptions.getVoiceUnits();
     return localeUtils.retrieveNonNullUnitType(getContext(), voiceUnits);
   }
 

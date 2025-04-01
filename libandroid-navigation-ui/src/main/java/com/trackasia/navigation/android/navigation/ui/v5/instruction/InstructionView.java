@@ -38,25 +38,26 @@ import com.trackasia.navigation.android.navigation.ui.v5.ThemeSwitcher;
 import com.trackasia.navigation.android.navigation.ui.v5.instruction.maneuver.ManeuverView;
 import com.trackasia.navigation.android.navigation.ui.v5.instruction.turnlane.TurnLaneAdapter;
 import com.trackasia.navigation.android.navigation.ui.v5.listeners.InstructionListListener;
-import com.trackasia.navigation.android.navigation.v5.models.BannerComponents;
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
-import com.trackasia.navigation.android.navigation.v5.models.BannerText;
-import com.trackasia.navigation.android.navigation.v5.models.LegStep;
+import com.trackasia.navigation.core.models.BannerComponents;
+import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.BannerText;
+import com.trackasia.navigation.core.models.LegStep;
 
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 
 import com.trackasia.navigation.android.navigation.ui.v5.summary.list.InstructionListAdapter;
-import com.trackasia.navigation.android.navigation.v5.milestone.BannerInstructionMilestone;
-import com.trackasia.navigation.android.navigation.v5.milestone.Milestone;
-import com.trackasia.navigation.android.navigation.v5.milestone.MilestoneEventListener;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
-import com.trackasia.navigation.android.navigation.v5.offroute.OffRouteListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
-import com.trackasia.navigation.android.navigation.v5.utils.LocaleUtils;
-import com.trackasia.navigation.android.navigation.v5.utils.RouteUtils;
+import com.trackasia.navigation.core.milestone.BannerInstructionMilestone;
+import com.trackasia.navigation.core.milestone.Milestone;
+import com.trackasia.navigation.core.milestone.MilestoneEventListener;
+import com.trackasia.navigation.core.models.UnitType;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
+import com.trackasia.navigation.core.offroute.OffRouteListener;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.LocaleUtils;
 
 import timber.log.Timber;
 
@@ -378,9 +379,8 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
   private void initialize() {
     LocaleUtils localeUtils = new LocaleUtils();
     String language = localeUtils.inferDeviceLanguage(getContext());
-    String unitType = localeUtils.getUnitTypeForDeviceLocale(getContext());
-    int roundingIncrement = NavigationConstants.ROUNDING_INCREMENT_FIFTY;
-    distanceFormatter = new DistanceFormatter(getContext(), language, unitType, roundingIncrement);
+    UnitType unitType = localeUtils.getUnitTypeForDeviceLocale(getContext());
+    distanceFormatter = new DistanceFormatter(getContext(), language, unitType, TrackAsiaNavigationOptions.RoundingIncrement.ROUNDING_INCREMENT_FIFTY);
     inflate(getContext(), R.layout.instruction_view_layout, this);
   }
 

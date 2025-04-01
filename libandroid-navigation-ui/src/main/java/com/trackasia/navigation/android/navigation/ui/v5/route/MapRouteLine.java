@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat;
 
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 import com.trackasia.navigation.android.navigation.ui.v5.utils.MapUtils;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteLeg;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteLeg;
 import com.trackasia.geojson.Feature;
 import com.trackasia.geojson.FeatureCollection;
 import com.trackasia.geojson.LineString;
@@ -356,8 +356,8 @@ class MapRouteLine {
 
   private Feature buildWayPointFeatureFromLeg(RouteLeg leg, int index) {
     Feature feature = Feature.fromGeometry(Point.fromLngLat(
-      leg.getSteps().get(index).getManeuver().getLocation().longitude(),
-      leg.getSteps().get(index).getManeuver().getLocation().latitude()
+      leg.getSteps().get(index).getManeuver().getLocation().getLongitude(),
+      leg.getSteps().get(index).getManeuver().getLocation().getLatitude()
     ));
     feature.addStringProperty(WAYPOINT_PROPERTY_KEY, index == 0 ? WAYPOINT_ORIGIN_VALUE : WAYPOINT_DESTINATION_VALUE);
     return feature;

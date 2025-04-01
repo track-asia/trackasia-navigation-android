@@ -13,12 +13,12 @@ import com.trackasia.navigation.android.navigation.ui.v5.listeners.NavigationLis
 import com.trackasia.navigation.android.navigation.ui.v5.listeners.RouteListener;
 import com.trackasia.navigation.android.navigation.ui.v5.listeners.SpeechAnnouncementListener;
 import com.trackasia.navigation.android.navigation.ui.v5.voice.SpeechAnnouncement;
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.geojson.Point;
-import com.trackasia.navigation.android.navigation.v5.milestone.MilestoneEventListener;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.milestone.MilestoneEventListener;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
 
 /**
  * In charge of holding any {@link NavigationView} related listeners {@link NavigationListener},

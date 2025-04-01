@@ -3,7 +3,7 @@ package com.trackasia.navigation.android.navigation.ui.v5.voice;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.trackasia.navigation.android.navigation.v5.offroute.OffRouteListener;
+import com.trackasia.navigation.core.offroute.OffRouteListener;
 
 /**
  * Used to play {@link SpeechAnnouncement}s.

@@ -1,9 +1,8 @@
 package com.trackasia.navigation.android.navigation.ui.v5;
 
-import android.location.Location;
-
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 class NavigationViewModelProgressChangeListener implements ProgressChangeListener {
 

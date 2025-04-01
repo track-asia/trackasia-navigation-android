@@ -13,12 +13,12 @@ import androidx.annotation.StyleRes;
 
 import androidx.fragment.app.Fragment;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.android.maps.MapView;
 import com.trackasia.android.maps.TrackAsiaMap;
 import com.trackasia.android.maps.Style;
 import com.trackasia.navigation.android.navigation.ui.v5.R;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,14 +4,14 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
 
 import java.util.Calendar;
 
-import static com.trackasia.navigation.android.navigation.v5.utils.time.TimeFormatter.formatTime;
-import static com.trackasia.navigation.android.navigation.v5.utils.time.TimeFormatter.formatTimeRemaining;
+import static com.trackasia.navigation.android.navigation.ui.v5.utils.time.TimeFormatter.formatTime;
+import static com.trackasia.navigation.android.navigation.ui.v5.utils.time.TimeFormatter.formatTimeRemaining;
 
 public class SummaryModel {
 

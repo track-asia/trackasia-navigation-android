@@ -7,9 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.trackasia.navigation.android.navigation.ui.v5.R;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
-import com.trackasia.navigation.android.navigation.v5.utils.RouteUtils;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
 
 public class InstructionListAdapter extends RecyclerView.Adapter<InstructionViewHolder> {
 

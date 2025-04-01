@@ -8,9 +8,9 @@ import com.trackasia.android.location.modes.CameraMode;
 import com.trackasia.android.maps.TrackAsiaMap;
 import com.trackasia.navigation.android.navigation.ui.v5.BaseTest;
 
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.navigation.camera.RouteInformation;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.camera.RouteInformation;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
 
 import org.junit.Test;
 

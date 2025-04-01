@@ -1,13 +1,14 @@
 package com.trackasia.navigation.android.navigation.ui.v5.map;
 
 import android.graphics.PointF;
-import android.location.Location;
 import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 
 import com.trackasia.geojson.Feature;
 import com.trackasia.geojson.Point;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
+import com.trackasia.geojson.common.CommonExtKt;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -1,5 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <declare-styleable name="trackasia_LocationLayer">
+        <attr name="trackasia_foregroundDrawable" format="reference" />
+        <attr name="trackasia_foregroundTintColor" format="color" />
+        <attr name="trackasia_backgroundDrawable" format="reference" />
+        <attr name="trackasia_backgroundTintColor" format="color" />
+        <attr name="trackasia_bearingDrawable" format="reference" />
+        <attr name="trackasia_bearingTintColor" format="color" />
+        <attr name="trackasia_gpsDrawable" format="reference" />
+        <attr name="trackasia_foregroundDrawableStale" format="reference" />
+        <attr name="trackasia_foregroundStaleTintColor" format="color" />
+        <attr name="trackasia_backgroundDrawableStale" format="reference" />
+        <attr name="trackasia_backgroundStaleTintColor" format="color" />
+        <attr name="trackasia_accuracyAlpha" format="float" />
+        <attr name="trackasia_accuracyColor" format="color" />
+        <attr name="trackasia_elevation" format="dimension" />
+        <attr name="trackasia_enableStaleState" format="boolean" />
+        <attr name="trackasia_staleStateTimeout" format="integer" min="0" />
+        <attr name="trackasia_iconPaddingLeft" format="integer" />
+        <attr name="trackasia_iconPaddingTop" format="integer" />
+        <attr name="trackasia_iconPaddingRight" format="integer" />
+        <attr name="trackasia_iconPaddingBottom" format="integer" />
+        <attr name="trackasia_layer_below" format="string" />
+        <attr name="trackasia_maxZoom" format="float" />
+        <attr name="trackasia_minZoom" format="float" />
+        <attr name="trackasia_maxZoomIconScale" format="float" />
+        <attr name="trackasia_minZoomIconScale" format="float" />
+        <attr name="trackasia_trackingInitialMoveThreshold" format="dimension" />
+        <attr name="trackasia_trackingMultiFingerMoveThreshold" format="dimension" />
+    </declare-styleable>
+    <dimen name="trackasia_locationLayerTrackingInitialMoveThreshold">25dp</dimen>
+    <dimen name="trackasia_locationLayerTrackingMultiFingerMoveThreshold">125dp</dimen>
+
+    <style name="trackasia_LocationLayer">
+        <item name="trackasia_foregroundDrawable">@drawable/trackasia_user_icon</item>
+        <item name="trackasia_backgroundDrawable">@drawable/trackasia_user_stroke_icon</item>
+        <item name="trackasia_bearingDrawable">@drawable/trackasia_user_bearing_icon</item>
+        <item name="trackasia_gpsDrawable">@drawable/trackasia_user_puck_icon</item>
+
+        <item name="trackasia_foregroundDrawableStale">@drawable/trackasia_user_icon_stale</item>
+        <item name="trackasia_backgroundDrawableStale">@drawable/trackasia_user_stroke_icon</item>
+
+        <item name="trackasia_accuracyAlpha">0.15</item>
+        <item name="trackasia_accuracyColor">@color/trackasia_location_layer_blue</item>
+
+        <item name="trackasia_elevation">12dp</item>
+
+        <item name="trackasia_enableStaleState">true</item>
+        <item name="trackasia_staleStateTimeout">30000</item>
+
+
+        <!-- Location icon padding -->
+        <item name="trackasia_iconPaddingLeft">0</item>
+        <item name="trackasia_iconPaddingTop">0</item>
+        <item name="trackasia_iconPaddingRight">0</item>
+        <item name="trackasia_iconPaddingBottom">0</item>
+
+        <!-- Map zoom levels -->
+        <item name="trackasia_maxZoom">18</item>
+        <item name="trackasia_minZoom">2</item>
+
+        <!-- Location icon scale based on map zoom levels -->
+        <item name="trackasia_maxZoomIconScale">1</item>
+        <item name="trackasia_minZoomIconScale">0.6</item>
+
+        <!-- Camera tracking settings -->
+        <item name="trackasia_trackingInitialMoveThreshold">
+            @dimen/trackasia_locationLayerTrackingInitialMoveThreshold
+        </item>
+        <item name="trackasia_trackingMultiFingerMoveThreshold">
+            @dimen/trackasia_locationLayerTrackingMultiFingerMoveThreshold
+        </item>
+
+    </style>
+
+
     <style name="NavigationMapRoute">
         <!-- Colors -->
         <item name="routeColor">@color/trackasia_navigation_route_layer_blue</item>

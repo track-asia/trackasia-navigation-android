@@ -4,15 +4,15 @@ import androidx.annotation.NonNull;
 import android.text.SpannableString;
 import android.view.View;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
-import com.trackasia.navigation.android.navigation.v5.models.LegStep;
-import com.trackasia.navigation.android.navigation.v5.models.ManeuverModifier;
-import com.trackasia.navigation.android.navigation.v5.models.RouteLeg;
-import com.trackasia.navigation.android.navigation.v5.models.StepManeuver;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteLegProgress;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
-import com.trackasia.navigation.android.navigation.v5.utils.RouteUtils;
+import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.LegStep;
+import com.trackasia.navigation.core.models.ManeuverModifier;
+import com.trackasia.navigation.core.models.RouteLeg;
+import com.trackasia.navigation.core.models.StepManeuver;
+import com.trackasia.navigation.core.routeprogress.RouteLegProgress;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.core.utils.RouteUtils;
 
 import java.util.ArrayList;
 import java.util.List;

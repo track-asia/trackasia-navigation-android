@@ -2,14 +2,16 @@ package com.trackasia.navigation.android.navigation.ui.v5;
 
 import static com.google.common.base.Charsets.UTF_8;
 
+import static com.trackasia.navigation.android.navigation.ui.v5.GeoJsonExtKt.toJvmPoints;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions;
+import com.trackasia.navigation.core.models.DirectionsResponse;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteOptions;
 import com.trackasia.geojson.Point;
-import com.trackasia.navigation.android.navigation.v5.utils.Constants;
+import com.trackasia.navigation.core.utils.Constants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,10 +46,10 @@ class TestRouteBuilder {
             Constants.BASE_API_URL,
             "user",
             "profile",
-            coordinates,
-            ACCESS_TOKEN,
-            "uuid"
+            toJvmPoints(coordinates)
         )
+            .withAccessToken(ACCESS_TOKEN)
+            .withRequestUuid("uuid")
             .withGeometries("mocked_geometries")
             .withVoiceInstructions(true)
             .withBannerInstructions(true)

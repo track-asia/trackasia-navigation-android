@@ -2,7 +2,7 @@ package com.trackasia.navigation.android.navigation.ui.v5;
 
 import android.app.Application;
 import android.content.Context;
-import android.location.Location;
+import com.trackasia.navigation.core.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,7 +10,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.trackasia.geojson.Point;
-import com.trackasia.android.location.engine.LocationEngine;
 import com.trackasia.navigation.android.navigation.ui.v5.camera.DynamicCamera;
 import com.trackasia.navigation.android.navigation.ui.v5.instruction.BannerInstructionModel;
 import com.trackasia.navigation.android.navigation.ui.v5.instruction.InstructionModel;
@@ -20,23 +19,25 @@ import com.trackasia.navigation.android.navigation.ui.v5.voice.SpeechAnnouncemen
 import com.trackasia.navigation.android.navigation.ui.v5.voice.SpeechPlayer;
 import com.trackasia.navigation.android.navigation.ui.v5.voice.SpeechPlayerProvider;
 import com.trackasia.navigation.android.navigation.ui.v5.route.TrackAsiaRouteFetcher;
-import com.trackasia.navigation.android.navigation.v5.milestone.BannerInstructionMilestone;
-import com.trackasia.navigation.android.navigation.v5.milestone.Milestone;
-import com.trackasia.navigation.android.navigation.v5.milestone.MilestoneEventListener;
-import com.trackasia.navigation.android.navigation.v5.milestone.VoiceInstructionMilestone;
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationEventListener;
-import com.trackasia.navigation.android.navigation.v5.navigation.camera.Camera;
-import com.trackasia.navigation.android.navigation.v5.offroute.OffRouteListener;
-import com.trackasia.navigation.android.navigation.v5.route.FasterRouteListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
-import com.trackasia.navigation.android.navigation.v5.utils.LocaleUtils;
-import com.trackasia.navigation.android.navigation.v5.utils.RouteUtils;
+import com.trackasia.navigation.core.location.engine.LocationEngine;
+import com.trackasia.navigation.core.milestone.BannerInstructionMilestone;
+import com.trackasia.navigation.core.milestone.Milestone;
+import com.trackasia.navigation.core.milestone.MilestoneEventListener;
+import com.trackasia.navigation.core.milestone.VoiceInstructionMilestone;
+import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteOptions;
+import com.trackasia.navigation.core.models.UnitType;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions;
+import com.trackasia.navigation.core.navigation.NavigationEventListener;
+import com.trackasia.navigation.core.navigation.camera.Camera;
+import com.trackasia.navigation.core.offroute.OffRouteListener;
+import com.trackasia.navigation.core.route.FasterRouteListener;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.LocaleUtils;
+import com.trackasia.navigation.core.utils.RouteUtils;
 
 import org.jetbrains.annotations.TestOnly;
 
@@ -246,9 +247,9 @@ public class NavigationViewModel extends AndroidViewModel {
         }
     }
 
-    private String initializeUnitType(NavigationUiOptions options) {
+    private UnitType initializeUnitType(NavigationUiOptions options) {
         RouteOptions routeOptions = options.directionsRoute().getRouteOptions();
-        String unitType = localeUtils.getUnitTypeForDeviceLocale(getApplication());
+        UnitType unitType = localeUtils.getUnitTypeForDeviceLocale(getApplication());
         if (routeOptions != null && routeOptions.getVoiceUnits() != null) {
             unitType = routeOptions.getVoiceUnits();
         }
@@ -259,14 +260,14 @@ public class NavigationViewModel extends AndroidViewModel {
         timeFormatType = options.getTimeFormatType();
     }
 
-    private int initializeRoundingIncrement(NavigationViewOptions options) {
+    private TrackAsiaNavigationOptions.RoundingIncrement initializeRoundingIncrement(NavigationViewOptions options) {
         TrackAsiaNavigationOptions navigationOptions = options.navigationOptions();
         return navigationOptions.getRoundingIncrement();
     }
 
     private void initializeDistanceFormatter(NavigationViewOptions options) {
-        String unitType = initializeUnitType(options);
-        int roundingIncrement = initializeRoundingIncrement(options);
+        UnitType unitType = initializeUnitType(options);
+        TrackAsiaNavigationOptions.RoundingIncrement roundingIncrement = initializeRoundingIncrement(options);
         distanceFormatter = new DistanceFormatter(getApplication(), language, unitType, roundingIncrement);
     }
 
@@ -294,7 +295,7 @@ public class NavigationViewModel extends AndroidViewModel {
     }
 
     private void initializeNavigation(Context context, TrackAsiaNavigationOptions options, LocationEngine locationEngine) {
-        navigation = new TrackAsiaNavigation(context, options, locationEngine);
+        navigation = new TrackAsiaNavigation(options, locationEngine);
         addNavigationListeners();
     }
 

@@ -1,6 +1,6 @@
 package com.trackasia.navigation.android.navigation.ui.v5;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.geojson.Point;
 
 

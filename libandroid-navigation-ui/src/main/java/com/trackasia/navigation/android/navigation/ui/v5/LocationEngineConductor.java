@@ -3,10 +3,10 @@ package com.trackasia.navigation.android.navigation.ui.v5;
 import android.content.Context;
 
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.android.location.engine.LocationEngine;
-import com.trackasia.navigation.android.navigation.v5.location.engine.LocationEngineProvider;
-import com.trackasia.navigation.android.navigation.v5.location.replay.ReplayRouteLocationEngine;
+import com.trackasia.navigation.core.location.engine.LocationEngine;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.location.engine.LocationEngineProvider;
+import com.trackasia.navigation.core.location.replay.ReplayRouteLocationEngine;
 
 class LocationEngineConductor {
 

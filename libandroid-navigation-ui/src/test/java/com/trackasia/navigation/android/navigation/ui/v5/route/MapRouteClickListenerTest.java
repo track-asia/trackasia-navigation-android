@@ -1,11 +1,11 @@
 package com.trackasia.navigation.android.navigation.ui.v5.route;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.geojson.LineString;
 import com.trackasia.android.geometry.LatLng;
 
 import org.junit.Test;
-import com.trackasia.navigation.android.navigation.v5.utils.Constants;
+import com.trackasia.navigation.core.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;

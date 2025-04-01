@@ -3,14 +3,15 @@ package com.trackasia.navigation.android.navigation.ui.v5.camera;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
-import android.location.Location;
+
+import com.trackasia.geojson.Point;
+import com.trackasia.navigation.core.location.Location;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.geojson.Point;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.android.camera.CameraPosition;
 import com.trackasia.android.camera.CameraUpdate;
 import com.trackasia.android.camera.CameraUpdateFactory;
@@ -22,12 +23,12 @@ import com.trackasia.android.location.OnCameraTrackingChangedListener;
 import com.trackasia.android.location.OnLocationCameraTransitionListener;
 import com.trackasia.android.location.modes.CameraMode;
 import com.trackasia.android.maps.TrackAsiaMap;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.navigation.camera.Camera;
-import com.trackasia.navigation.android.navigation.v5.navigation.camera.RouteInformation;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.MathUtils;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.camera.Camera;
+import com.trackasia.navigation.core.navigation.camera.RouteInformation;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,9 +38,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import timber.log.Timber;
 
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.NAVIGATION_MAX_CAMERA_ADJUSTMENT_ANIMATION_DURATION;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.NAVIGATION_MIN_CAMERA_TILT_ADJUSTMENT_ANIMATION_DURATION;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.NAVIGATION_MIN_CAMERA_ZOOM_ADJUSTMENT_ANIMATION_DURATION;
+import static com.trackasia.navigation.android.navigation.ui.v5.GeoJsonExtKt.toJvmPoints;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.NAVIGATION_MAX_CAMERA_ADJUSTMENT_ANIMATION_DURATION;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.NAVIGATION_MIN_CAMERA_TILT_ADJUSTMENT_ANIMATION_DURATION;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.NAVIGATION_MIN_CAMERA_ZOOM_ADJUSTMENT_ANIMATION_DURATION;
 
 /**
  * Updates the map camera while navigating.
@@ -435,7 +437,7 @@ public class NavigationCamera implements LifecycleObserver {
 
   private void animateCameraForRouteOverview(RouteInformation routeInformation, int[] padding) {
     Camera cameraEngine = navigation.getCameraEngine();
-    List<Point> routePoints = cameraEngine.overview(routeInformation);
+    List<Point> routePoints = toJvmPoints(cameraEngine.overview(routeInformation));
     if (!routePoints.isEmpty()) {
       animateTrackAsiaMapForRouteOverview(padding, routePoints);
     }

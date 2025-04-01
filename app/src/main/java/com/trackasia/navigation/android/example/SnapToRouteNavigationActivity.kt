@@ -1,9 +1,8 @@
 package com.trackasia.navigation.android.example
 
-import android.location.Location
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse
+import com.trackasia.navigation.core.models.DirectionsResponse
 import com.trackasia.geojson.Point
 import com.trackasia.android.location.LocationComponent
 import com.trackasia.android.location.LocationComponentActivationOptions
@@ -14,17 +13,20 @@ import com.trackasia.android.maps.TrackAsiaMap
 import com.trackasia.android.maps.OnMapReadyCallback
 import com.trackasia.android.maps.Style
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationRoute
-import com.trackasia.navigation.android.navigation.v5.location.replay.ReplayRouteLocationEngine
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress
-import com.trackasia.navigation.android.navigation.v5.snap.SnapToRoute
+import com.trackasia.navigation.core.location.replay.ReplayRouteLocationEngine
+import com.trackasia.navigation.core.models.DirectionsRoute
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener
+import com.trackasia.navigation.core.routeprogress.RouteProgress
+import com.trackasia.navigation.core.snap.SnapToRoute
 import okhttp3.Request
 import com.trackasia.navigation.android.example.databinding.ActivitySnapToRouteNavigationBinding
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationMapRoute
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsCriteria
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions
+import com.trackasia.navigation.core.location.Location
+import com.trackasia.navigation.core.location.toAndroidLocation
+import com.trackasia.navigation.core.models.UnitType
+import com.trackasia.navigation.core.navigation.AndroidTrackAsiaNavigation
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,7 +59,7 @@ class SnapToRouteNavigationActivity : AppCompatActivity(), OnMapReadyCallback,
         binding = ActivitySnapToRouteNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        navigation = TrackAsiaNavigation(
+        navigation = AndroidTrackAsiaNavigation(
             this,
             TrackAsiaNavigationOptions(snapToRoute = true)
         ).apply {
@@ -79,7 +81,9 @@ class SnapToRouteNavigationActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onMapReady(trackAsiaMap: TrackAsiaMap) {
         this.trackAsiaMap = trackAsiaMap
-        trackAsiaMap.setStyle(Style.Builder().fromUri(getString(R.string.map_style_light))) { style ->
+        trackAsiaMap.setStyle(
+            Style.Builder().fromUri(getString(R.string.map_style_light))
+        ) { style ->
             enableLocationComponent(style)
             navigationMapRoute = NavigationMapRoute(navigation, binding.mapView, trackAsiaMap)
             calculateRouteAndStartNavigation()
@@ -129,7 +133,7 @@ class SnapToRouteNavigationActivity : AppCompatActivity(), OnMapReadyCallback,
             this.origin(Point.fromLngLat(9.7536318, 52.3717979))
             this.addWaypoint(Point.fromLngLat(9.741052, 52.360496))
             this.destination(Point.fromLngLat(9.756259, 52.342620))
-            this.voiceUnits(DirectionsCriteria.METRIC)
+            this.voiceUnits(UnitType.METRIC)
             this.alternatives(true)
             this.baseUrl(getString(R.string.base_url))
         }
@@ -142,7 +146,7 @@ class SnapToRouteNavigationActivity : AppCompatActivity(), OnMapReadyCallback,
                 Timber.d("Url: %s", (call.request() as Request).url.toString())
                 response.body()?.let { responseBody ->
                     if (responseBody.routes.isNotEmpty()) {
-                        val trackasiaResponse = DirectionsResponse.fromJson(responseBody.toJson());
+                        val trackasiaResponse = DirectionsResponse.fromJson(responseBody.toJson())
                         val directionsRoute = trackasiaResponse.routes.first()
                         this@SnapToRouteNavigationActivity.route = directionsRoute
                         navigationMapRoute?.addRoutes(trackasiaResponse.routes)
@@ -170,7 +174,7 @@ class SnapToRouteNavigationActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onProgressChange(location: Location, routeProgress: RouteProgress) {
         // Update own location with the snapped location
-        locationComponent?.forceLocationUpdate(location)
+        locationComponent?.forceLocationUpdate(location.toAndroidLocation())
     }
 
     override fun onResume() {

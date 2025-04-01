@@ -4,15 +4,13 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse
-import com.trackasia.geojson.Point
+import com.trackasia.navigation.core.models.DirectionsResponse
 import com.trackasia.android.annotations.MarkerOptions
 import com.trackasia.android.camera.CameraUpdateFactory
 import com.trackasia.android.geometry.LatLng
@@ -24,26 +22,28 @@ import com.trackasia.android.maps.TrackAsiaMap
 import com.trackasia.android.maps.OnMapReadyCallback
 import com.trackasia.android.maps.Style
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationRoute
-import com.trackasia.navigation.android.navigation.v5.location.replay.ReplayRouteLocationEngine
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsCriteria
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute
-import com.trackasia.navigation.android.navigation.v5.offroute.OffRouteListener
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress
+import com.trackasia.navigation.core.location.replay.ReplayRouteLocationEngine
+import com.trackasia.navigation.core.models.DirectionsRoute
+import com.trackasia.navigation.core.offroute.OffRouteListener
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener
+import com.trackasia.navigation.core.routeprogress.RouteProgress
 import com.trackasia.turf.TurfConstants
 import com.trackasia.turf.TurfMeasurement
 import okhttp3.Request
 import com.trackasia.navigation.android.example.databinding.ActivityMockNavigationBinding
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationMapRoute
-import com.trackasia.navigation.android.navigation.v5.instruction.Instruction
-import com.trackasia.navigation.android.navigation.v5.milestone.Milestone
-import com.trackasia.navigation.android.navigation.v5.milestone.MilestoneEventListener
-import com.trackasia.navigation.android.navigation.v5.milestone.RouteMilestone
-import com.trackasia.navigation.android.navigation.v5.milestone.Trigger
-import com.trackasia.navigation.android.navigation.v5.milestone.TriggerProperty
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationEventListener
+import com.trackasia.navigation.core.instruction.Instruction
+import com.trackasia.navigation.core.location.Location
+import com.trackasia.navigation.core.milestone.Milestone
+import com.trackasia.navigation.core.milestone.MilestoneEventListener
+import com.trackasia.navigation.core.milestone.RouteMilestone
+import com.trackasia.navigation.core.milestone.Trigger
+import com.trackasia.navigation.core.milestone.TriggerProperty
+import com.trackasia.navigation.core.models.UnitType
+import com.trackasia.navigation.core.navigation.AndroidTrackAsiaNavigation
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation
+import com.trackasia.navigation.core.navigation.NavigationEventListener
+import com.trackasia.geojson.Point
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -83,22 +83,7 @@ class MockNavigationActivity :
             getMapAsync(this@MockNavigationActivity)
         }
 
-        val context = applicationContext
-        val customNotification =
-            CustomNavigationNotification(
-                context
-            )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            customNotification.createNotificationChannel(this)
-        }
-        val options = TrackAsiaNavigationOptions(navigationNotification = customNotification)
-
-        navigation =
-            TrackAsiaNavigation(
-                this,
-                options
-            )
-
+        navigation = AndroidTrackAsiaNavigation(applicationContext)
         navigation.addMilestone(
             RouteMilestone(
                 identifier = BEGIN_ROUTE_MILESTONE,
@@ -116,7 +101,6 @@ class MockNavigationActivity :
                 ),
             )
         )
-        customNotification.register(MyBroadcastReceiver(navigation), context)
 
         binding.startRouteButton.setOnClickListener {
             route?.let { route ->
@@ -198,15 +182,15 @@ class MockNavigationActivity :
             // Set the component's render mode
             it.renderMode = RenderMode.GPS
 
-            it.locationEngine = locationEngine
+//            it.locationEngine = locationEngine
         }
     }
 
     override fun onMapClick(point: LatLng): Boolean {
         var addMarker = true
         when {
-            destination == null -> destination = Point.fromLngLat(point.longitude, point.latitude)
-            waypoint == null -> waypoint = Point.fromLngLat(point.longitude, point.latitude)
+            destination == null -> destination = Point.fromLngLat(point.longitude, point.latitude, point.altitude)
+            waypoint == null -> waypoint = Point.fromLngLat(point.longitude, point.latitude, point.altitude)
             else -> {
                 Toast.makeText(this, "Only 2 waypoints supported", Toast.LENGTH_LONG).show()
                 addMarker = false
@@ -235,7 +219,7 @@ class MockNavigationActivity :
             return
         }
 
-        val origin = Point.fromLngLat(userLocation.longitude, userLocation.latitude)
+        val origin = Point.fromLngLat(userLocation.longitude, userLocation.latitude, userLocation.altitude ?: 0.0)
         if (TurfMeasurement.distance(origin, destination, TurfConstants.UNIT_METERS) < 50) {
             binding.startRouteButton.visibility = View.GONE
             return
@@ -245,7 +229,7 @@ class MockNavigationActivity :
             this.accessToken(getString(R.string.mapbox_access_token))
             this.origin(origin)
             this.destination(destination)
-            this.voiceUnits(DirectionsCriteria.METRIC)
+            this.voiceUnits(UnitType.METRIC)
             this.alternatives(true)
             this.baseUrl(getString(R.string.base_url))
         }

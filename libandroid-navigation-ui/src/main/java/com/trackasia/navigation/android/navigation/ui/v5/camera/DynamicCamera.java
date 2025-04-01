@@ -1,20 +1,22 @@
 package com.trackasia.navigation.android.navigation.ui.v5.camera;
 
-import android.location.Location;
+
+import static com.trackasia.geojson.common.CommonExtKt.toJvm;
+
+import com.trackasia.android.geometry.LatLng;
+import com.trackasia.geojson.Point;
+import com.trackasia.navigation.core.location.Location;
 import androidx.annotation.NonNull;
 
-import com.trackasia.navigation.android.navigation.v5.models.LegStep;
+import com.trackasia.navigation.core.models.LegStep;
 
-import com.trackasia.android.TrackAsia;
-import com.trackasia.geojson.Point;
 import com.trackasia.android.camera.CameraPosition;
-import com.trackasia.android.geometry.LatLng;
 import com.trackasia.android.geometry.LatLngBounds;
 import com.trackasia.android.maps.TrackAsiaMap;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
-import com.trackasia.navigation.android.navigation.v5.navigation.camera.RouteInformation;
-import com.trackasia.navigation.android.navigation.v5.navigation.camera.SimpleCamera;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
+import com.trackasia.navigation.core.navigation.camera.RouteInformation;
+import com.trackasia.navigation.core.navigation.camera.SimpleCamera;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,10 +135,10 @@ public class DynamicCamera extends SimpleCamera {
   private CameraPosition createCameraPosition(Location location, RouteProgress routeProgress) {
     LegStep upComingStep = routeProgress.getCurrentLegProgress().getUpComingStep();
     if (upComingStep != null) {
-      Point stepManeuverPoint = upComingStep.getManeuver().getLocation();
+      Point stepManeuverPoint = toJvm(upComingStep.getManeuver().getLocation());
 
       List<LatLng> latLngs = new ArrayList<>();
-      LatLng currentLatLng = new LatLng(location);
+      LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
       LatLng maneuverLatLng = new LatLng(stepManeuverPoint.latitude(), stepManeuverPoint.longitude());
       latLngs.add(currentLatLng);
       latLngs.add(maneuverLatLng);
@@ -146,8 +148,8 @@ public class DynamicCamera extends SimpleCamera {
       }
 
       LatLngBounds cameraBounds = new LatLngBounds.Builder()
-        .includes(latLngs)
-        .build();
+          .includes(latLngs)
+          .build();
 
       int[] padding = {0, 0, 0, 0};
       return trackAsiaMap.getCameraForLatLngBounds(cameraBounds, padding);

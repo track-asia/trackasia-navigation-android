@@ -8,10 +8,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.trackasia.navigation.android.navigation.ui.v5.listeners.NavigationListener;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.android.camera.CameraPosition;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
 
 /**
  * Serves as a launching point for the custom drop-in UI, {@link NavigationView}.

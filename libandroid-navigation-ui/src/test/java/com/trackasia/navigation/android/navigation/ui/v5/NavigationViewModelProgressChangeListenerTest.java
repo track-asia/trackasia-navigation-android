@@ -1,10 +1,7 @@
 package com.trackasia.navigation.android.navigation.ui.v5;
 
-import android.location.Location;
-
-import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewModel;
-import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewModelProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 import org.junit.Test;
 

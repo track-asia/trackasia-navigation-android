@@ -1,20 +1,22 @@
 package com.trackasia.navigation.android.navigation.ui.v5.route;
 
+import static com.trackasia.navigation.android.navigation.ui.v5.GeoJsonExtKt.toJvmPoints;
+
 import android.content.Context;
-import android.location.Location;
+import com.trackasia.navigation.core.location.Location;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.mapbox.geojson.Point;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions;
-import com.trackasia.navigation.android.navigation.v5.route.RouteFetcher;
-import com.trackasia.navigation.android.navigation.v5.route.RouteListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.RouteUtils;
+import com.trackasia.navigation.core.models.DirectionsResponse;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteOptions;
+import com.trackasia.navigation.core.route.RouteFetcher;
+import com.trackasia.navigation.core.route.RouteListener;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.utils.RouteUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -74,13 +76,13 @@ public class TrackAsiaRouteFetcher extends RouteFetcher {
             return null;
         }
         Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
-        Double bearing = location.hasBearing() ? Float.valueOf(location.getBearing()).doubleValue() : null;
+        Double bearing = location.getBearing() != null ? Float.valueOf(location.getBearing()).doubleValue() : null;
         RouteOptions options = progress.getDirectionsRoute().getRouteOptions();
         NavigationRoute.Builder builder = NavigationRoute.builder(context)
                 .origin(toTrackAsiaPoint(origin), bearing, BEARING_TOLERANCE)
                 .routeOptions(options);
 
-        List<Point> remainingWaypoints = toMapboxPointList(routeUtils.calculateRemainingWaypoints(progress));
+        List<Point> remainingWaypoints = toMapboxPointList(toJvmPoints(routeUtils.calculateRemainingWaypoints(progress)));
         if (remainingWaypoints == null) {
             Timber.e("An error occurred fetching a new route");
             return null;

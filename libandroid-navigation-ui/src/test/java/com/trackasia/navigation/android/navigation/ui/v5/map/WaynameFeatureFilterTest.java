@@ -3,8 +3,6 @@ package com.trackasia.navigation.android.navigation.ui.v5.map;
 import static com.google.common.base.Charsets.UTF_8;
 import static org.mockito.Mockito.mock;
 
-import android.location.Location;
-
 import androidx.annotation.NonNull;
 
 import com.trackasia.geojson.Feature;
@@ -12,7 +10,7 @@ import com.trackasia.geojson.LineString;
 import com.trackasia.geojson.Point;
 
 import org.junit.Test;
-import com.trackasia.navigation.android.navigation.ui.v5.map.WaynameFeatureFilter;
+import com.trackasia.navigation.core.location.Location;
 
 import java.io.InputStream;
 import java.util.ArrayList;

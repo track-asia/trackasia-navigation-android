@@ -1,19 +1,15 @@
-<p align="center">
-  <a href="https://jitpack.io/#trackasia/trackasia-navigation-android">
-    <img src="https://jitpack.io/v/track-asia/trackasia-navigation-android.svg"
-         alt="Jitpack">
-  </a>
-</p>
-
-# Trackasia Navigation SDK for Android
+TrackAsia Navigation SDK for Android (and KMP)
+=============================================
 
 The Trackasia Navigation SDK for Android is built on a fork of the [Mapbox Navigation SDK v0.19](https://github.com/flitsmeister/flitsmeister-navigation-android/tree/v0.19.0) which is built on top of the [Mapbox Directions API](https://www.mapbox.com/directions) and contains the logic needed to get timed navigation instructions.
 
 With this SDK you can implement turn-by-turn navigation in your own Android app while hosting your Map tiles and Directions API.
 
+> [!NOTE]  
+> We are currently active working on converting this pure Android library to a Kotlin Multiplatform library.
 
 <div align="center">
-  <img src="https://github.com/track-asia/trackasia-navigation-android/blob/main/.github/preview.png" height="350px" alt="TrackAsia Navigation Android">
+  <img src="https://github.com/trackasia/trackasia-navigation-android/blob/main/.github/preview.png" height="350px" alt="TrackAsia Navigation Android">
 </div>
 
 ## License
@@ -34,7 +30,7 @@ All issues are covered with this SDK.
 ## What have we changed
 
 - We completely removed the UI part from the SDK so it will only contain the logic for navigation and not the visuals.
-- We upgraded the [Mapbox Maps SDK for Android](https://github.com/mapbox/mapbox-gl-native/tree/master/platform/android) to [TrackAsia Native for Android](https://github.com/track-asia/trackasia-gl-native/tree/master/platform/android) version 9.4.0.
+- We upgraded the [Mapbox Maps SDK for Android](https://github.com/mapbox/mapbox-gl-native/tree/master/platform/android) to [TrackAsia Native for Android](https://github.com/trackasia/trackasia-gl-native/tree/master/platform/android) version 9.4.0.
 - We upgraded the [NavigationRoute](https://github.com/flitsmeister/flitsmeister-navigation-android/blob/master/libandroid-navigation/src/main/java/com/mapbox/services/android/navigation/v5/navigation/NavigationRoute.java#L425) 
  with the possibility to add an interceptor to the request.
 - We changed the [locationLayerPlugin](https://github.com/mapbox/mapbox-plugins-android) to the [location component](https://docs.mapbox.com/android/api/map-sdk/8.5.0/com/mapbox/mapboxsdk/location/LocationComponent.html)
@@ -43,74 +39,36 @@ All issues are covered with this SDK.
 
 ## Getting Started
 
-If you are looking to include this inside your project, you have to follow the following steps:
+This library is available on Maven Central. To use it, add the following to your `build.gradle`:
 
 ### Gradle
-Step 1. Add it to your root `build.gradle` at the end of repositories:
-```
-  allprojects {
-    repositories {
-      ...
-      maven { url 'https://jitpack.io' }
-    }
-  }
-```
+
 Step 2. Add the dependency
-```
-  implementation 'com.github.trackasia:trackasia-navigation-android:4.0.0'
+```groovy
+  // Core KMP library (without UI)
+  implementation 'com.trackasia.navigation:navigation-core:5.0.0-pre1'
+
+  // UI library (Android only)
+  implementation 'com.trackasia.navigation:navigation-ui-android:5.0.0-pre1'
 ```
 
-### Maven
-Step 1. Add it to your root `build.gradle` at the end of repositories:
-```
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-```
-Step 2. Add the dependency
-```
-  <dependency>
-	    <groupId>com.github.trackasia</groupId>
-	    <artifactId>trackasia-navigation-android</artifactId>
-	    <version>4.0.0</version>
-	</dependency>
-```
-
-### sbt
-Step 1. Add it in your `build.sbt` at the end of resolvers:
-```
-  resolvers += "jitpack" at "https://jitpack.io"
-```
-Step 2. Add the dependency
-```
-  libraryDependencies += "com.github.trackasia" % "trackasia-navigation-android" % "4.0.0"
-```
-
-### leiningen
-Step 1. Add it in your `project.clj` at the end of repositories:
-```
-  :repositories [["jitpack" "https://jitpack.io"]]
-```
-Step 2. Add the dependency
-```
-  :dependencies [[com.github.trackasia/trackasia-navigation-android "4.0.0"]]	
-```
-
-To run the [sample code](#sample-code) on a device or emulator, include your [Mapbox access token](https://www.mapbox.com/help/define-access-token/) and map tile provider URL in `developer-config.xml` found in the project. 
 
 ## Getting Help
 
-- **Have a bug to report?** [Open an issue](https://github.com/track-asia/trackasia-navigation-android/issues). If possible, include the version of TrackAsia Services, a full log, and a project that shows the issue.
-- **Have a feature request?** [Open an issue](https://github.com/track-asia/trackasia-navigation-android/issues/new). Tell us what the feature should do and why you want the feature.
+- **Have a bug to report?** [Open an issue](https://github.com/trackasia/trackasia-navigation-android/issues). If possible, include the version of TrackAsia Services, a full log, and a project that shows the issue.
+- **Have a feature request?** [Open an issue](https://github.com/trackasia/trackasia-navigation-android/issues/new). Tell us what the feature should do and why you want the feature.
 
-### <a name="sample-code">Sample code
+### Samples
 
-We've added some [examples](https://github.com/track-asia/trackasia-navigation-android/tree/main/app/src/main/java/org/track-asia/navigation/android/example) to this repo's test app. We are planning to add more to help you get started with the SDK and to inspire you.
+#### Android
 
-In order to see the map or calculate a route you need your own Maptile and Direction services.
+We have added [an Android example app](https://github.com/trackasia/trackasia-navigation-android/tree/main/app/src/main/java/com.trackasia/navigation/android/example) to this repo.
+
+The Valhalla example is aready pre-configured. All other examples needs to be configured with your own tile and direction server. This URLs needs to be set in `developer-config.xml`, which is generated on first Gradle run. 
+
+#### Multiplatform
+
+The new Kotlin Multiplatform library for iOS and Android has it's own small [sample apps](https://github.com/trackasia/trackasia-navigation-android/tree/main/sample) for all supported platforms.
 
 ### Contributing
 

@@ -1,10 +1,10 @@
 package com.trackasia.navigation.android.navigation.ui.v5.map;
 
-import android.location.Location;
 import android.os.AsyncTask;
 
 import com.trackasia.geojson.Feature;
 import com.trackasia.geojson.Point;
+import com.trackasia.navigation.core.location.Location;
 
 import java.util.List;
 

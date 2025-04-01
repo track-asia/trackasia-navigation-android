@@ -1,0 +1,5 @@
+framework module TrackAsia {
+  umbrella header "TrackAsia.h"
+  export *
+  module * { export * }
+}

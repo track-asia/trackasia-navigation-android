@@ -1,13 +1,13 @@
 package com.trackasia.navigation.android.navigation.ui.v5.instruction.turnlane;
 
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.STEP_MANEUVER_MODIFIER_RIGHT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.STEP_MANEUVER_MODIFIER_STRAIGHT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.TURN_LANE_INDICATION_LEFT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.TURN_LANE_INDICATION_RIGHT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.TURN_LANE_INDICATION_SLIGHT_LEFT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.TURN_LANE_INDICATION_SLIGHT_RIGHT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.TURN_LANE_INDICATION_STRAIGHT;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.TURN_LANE_INDICATION_UTURN;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.STEP_MANEUVER_MODIFIER_RIGHT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.STEP_MANEUVER_MODIFIER_STRAIGHT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.TURN_LANE_INDICATION_LEFT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.TURN_LANE_INDICATION_RIGHT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.TURN_LANE_INDICATION_SLIGHT_LEFT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.TURN_LANE_INDICATION_SLIGHT_RIGHT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.TURN_LANE_INDICATION_STRAIGHT;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.TURN_LANE_INDICATION_UTURN;
 
 public class TurnLaneViewData {
 

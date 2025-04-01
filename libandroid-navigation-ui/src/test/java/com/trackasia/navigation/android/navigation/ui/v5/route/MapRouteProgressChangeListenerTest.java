@@ -6,13 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import android.location.Location;
-
-import com.trackasia.navigation.android.navigation.ui.v5.route.MapRouteArrow;
-import com.trackasia.navigation.android.navigation.ui.v5.route.MapRouteLine;
-import com.trackasia.navigation.android.navigation.ui.v5.route.MapRouteProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 import org.junit.Test;
 

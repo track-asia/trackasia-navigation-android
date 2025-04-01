@@ -2,13 +2,13 @@ package com.trackasia.navigation.android.navigation.ui.v5.route;
 
 import android.os.Handler;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteLeg;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteLeg;
 import com.trackasia.geojson.Feature;
 import com.trackasia.geojson.FeatureCollection;
 import com.trackasia.geojson.LineString;
 import com.trackasia.geojson.Point;
-import com.trackasia.navigation.android.navigation.v5.utils.Constants;
+import com.trackasia.navigation.core.utils.Constants;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

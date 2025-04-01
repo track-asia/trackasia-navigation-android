@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewModel;
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewRouteEngineListener;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.geojson.Point;
 
 import org.junit.Test;

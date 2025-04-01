@@ -9,9 +9,9 @@ import android.preference.PreferenceManager;
 import com.google.gson.Gson;
 
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationRoute;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
-import com.trackasia.navigation.android.navigation.v5.location.replay.ReplayRouteLocationEngine;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
+import com.trackasia.navigation.core.location.replay.ReplayRouteLocationEngine;
 
 /**
  * Use this class to launch the navigation UI

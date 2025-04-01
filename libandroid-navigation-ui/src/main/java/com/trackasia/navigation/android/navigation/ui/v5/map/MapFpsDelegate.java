@@ -6,11 +6,11 @@ import com.trackasia.android.maps.MapView;
 import com.trackasia.navigation.android.navigation.ui.v5.camera.NavigationCamera;
 import com.trackasia.navigation.android.navigation.ui.v5.camera.OnTrackingModeChangedListener;
 import com.trackasia.navigation.android.navigation.ui.v5.camera.OnTrackingModeTransitionListener;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteLegProgress;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.routeprogress.RouteLegProgress;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 class MapFpsDelegate implements OnTrackingModeChangedListener, OnTrackingModeTransitionListener {
 

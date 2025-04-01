@@ -1,6 +1,6 @@
 package com.trackasia.navigation.android.navigation.ui.v5;
 
-import android.location.Location;
+import com.trackasia.navigation.core.location.Location;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.geojson.Point;
 
 class NavigationViewSubscriber implements LifecycleObserver {

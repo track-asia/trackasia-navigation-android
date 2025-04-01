@@ -14,7 +14,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 
 import com.trackasia.android.utils.BitmapUtils;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
 
 /**
  * This class is used to switch theme colors in {@link NavigationView}.

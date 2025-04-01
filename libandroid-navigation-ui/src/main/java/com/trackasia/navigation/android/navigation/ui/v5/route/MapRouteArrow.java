@@ -27,7 +27,7 @@ import com.trackasia.android.style.sources.GeoJsonSource;
 import com.trackasia.android.utils.MathUtils;
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 import com.trackasia.navigation.android.navigation.ui.v5.utils.MapImageUtils;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 import com.trackasia.turf.TurfConstants;
 import com.trackasia.turf.TurfMeasurement;
 import com.trackasia.turf.TurfMisc;
@@ -49,6 +49,8 @@ import static com.trackasia.android.style.layers.Property.VISIBLE;
 import static com.trackasia.android.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.trackasia.android.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.trackasia.android.style.layers.PropertyFactory.visibility;
+import static com.trackasia.geojson.common.CommonExtKt.toJvm;
+import static com.trackasia.navigation.android.navigation.ui.v5.GeoJsonExtKt.toJvmPoints;
 
 class MapRouteArrow {
 
@@ -110,11 +112,11 @@ class MapRouteArrow {
   }
 
   private List<Point> obtainArrowPointsFrom(RouteProgress routeProgress) {
-    List<Point> reversedCurrent = new ArrayList<>(routeProgress.getCurrentStepPoints());
+    List<Point> reversedCurrent = new ArrayList<>(toJvmPoints(routeProgress.getCurrentStepPoints()));
     Collections.reverse(reversedCurrent);
 
     LineString arrowLineCurrent = LineString.fromLngLats(reversedCurrent);
-    LineString arrowLineUpcoming = LineString.fromLngLats(routeProgress.getUpcomingStepPoints());
+    LineString arrowLineUpcoming = LineString.fromLngLats(toJvmPoints(routeProgress.getUpcomingStepPoints()));
 
     LineString arrowCurrentSliced = TurfMisc.lineSliceAlong(arrowLineCurrent, 0, RouteConstants.THIRTY, TurfConstants.UNIT_METERS);
     LineString arrowUpcomingSliced = TurfMisc.lineSliceAlong(arrowLineUpcoming, 0, RouteConstants.THIRTY, TurfConstants.UNIT_METERS);

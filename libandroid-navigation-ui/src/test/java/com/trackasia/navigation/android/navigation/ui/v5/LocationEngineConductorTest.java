@@ -12,8 +12,8 @@ import android.location.LocationManager;
 
 import androidx.annotation.NonNull;
 
-import com.trackasia.android.location.engine.LocationEngine;
-import com.trackasia.navigation.android.navigation.v5.location.replay.ReplayRouteLocationEngine;
+import com.trackasia.navigation.core.location.engine.LocationEngine;
+import com.trackasia.navigation.core.location.replay.ReplayRouteLocationEngine;
 
 import org.junit.Test;
 

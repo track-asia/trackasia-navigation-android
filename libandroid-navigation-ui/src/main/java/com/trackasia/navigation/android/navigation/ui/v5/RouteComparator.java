@@ -3,9 +3,9 @@ package com.trackasia.navigation.android.navigation.ui.v5;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.RouteLeg;
+import com.trackasia.navigation.core.models.DirectionsResponse;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.RouteLeg;
 
 import java.util.List;
 

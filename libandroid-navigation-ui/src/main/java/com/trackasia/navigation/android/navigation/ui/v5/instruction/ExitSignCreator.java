@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerComponents;
+import com.trackasia.navigation.core.models.BannerComponents;
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 
 import java.util.List;

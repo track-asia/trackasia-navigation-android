@@ -9,9 +9,9 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.navigation.android.navigation.ui.v5.voice.SpeechPlayer;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

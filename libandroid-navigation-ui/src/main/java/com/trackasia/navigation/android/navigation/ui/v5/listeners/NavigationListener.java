@@ -2,7 +2,7 @@ package com.trackasia.navigation.android.navigation.ui.v5.listeners;
 
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationView;
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewOptions;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
 
 /**
  * A listener that can be implemented and

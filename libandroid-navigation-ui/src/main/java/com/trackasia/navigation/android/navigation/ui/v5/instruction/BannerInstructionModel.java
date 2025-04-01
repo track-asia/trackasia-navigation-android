@@ -2,10 +2,10 @@ package com.trackasia.navigation.android.navigation.ui.v5.instruction;
 
 import androidx.annotation.Nullable;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
-import com.trackasia.navigation.android.navigation.v5.models.BannerText;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.BannerText;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
 
 public class BannerInstructionModel extends InstructionModel {
 

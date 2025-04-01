@@ -3,8 +3,8 @@ package com.trackasia.navigation.android.navigation.ui.v5.voice;
 import androidx.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
-import com.trackasia.navigation.android.navigation.v5.milestone.VoiceInstructionMilestone;
-import com.trackasia.navigation.android.navigation.v5.milestone.MilestoneEventListener;
+import com.trackasia.navigation.core.milestone.VoiceInstructionMilestone;
+import com.trackasia.navigation.core.milestone.MilestoneEventListener;
 
 /**
  * Used with {@link NavigationSpeechPlayer#play(SpeechAnnouncement)}.

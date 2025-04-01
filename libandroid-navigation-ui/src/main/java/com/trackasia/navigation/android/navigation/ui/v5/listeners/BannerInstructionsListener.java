@@ -1,6 +1,6 @@
 package com.trackasia.navigation.android.navigation.ui.v5.listeners;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
+import com.trackasia.navigation.core.models.BannerInstructions;
 
 /**
  * This listener will be triggered when a {@link BannerInstructions} is about to be displayed.

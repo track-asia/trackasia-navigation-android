@@ -1,0 +1,20 @@
+{
+  "name": "TrackAsiaNavigationCore",
+  "version": "0.1.0",
+  "homepage": "https://github.com/trackasia/trackasia-navigation-android/",
+  "source": {
+    "http": ""
+  },
+  "authors": "",
+  "license": "",
+  "summary": "TrackAsia navigation core library",
+  "vendored_frameworks": "TrackAsiaNavigationCore.xcframework",
+  "libraries": "c++",
+  "platforms": {
+    "osx": null,
+    "ios": null,
+    "tvos": null,
+    "visionos": null,
+    "watchos": null
+  }
+}

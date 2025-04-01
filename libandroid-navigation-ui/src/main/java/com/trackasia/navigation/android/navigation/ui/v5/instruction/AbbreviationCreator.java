@@ -2,7 +2,7 @@ package com.trackasia.navigation.android.navigation.ui.v5.instruction;
 
 import android.widget.TextView;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerComponents;
+import com.trackasia.navigation.core.models.BannerComponents;
 
 import java.util.ArrayList;
 import java.util.Collections;

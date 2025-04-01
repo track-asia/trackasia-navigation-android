@@ -1,13 +1,12 @@
 package com.trackasia.navigation.android.navigation.ui.v5.map;
 
-import static com.trackasia.navigation.android.navigation.ui.v5.map.NavigationSymbolManager.TRACKASIA_NAVIGATION_MARKER_NAME;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants.NAVIGATION_MINIMUM_MAP_ZOOM;
+import static com.trackasia.navigation.core.location.LocationExtKt.toAndroidLocation;
+import static com.trackasia.navigation.core.navigation.NavigationConstants.NAVIGATION_MINIMUM_MAP_ZOOM;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
@@ -20,7 +19,8 @@ import androidx.fragment.app.FragmentActivity;
 import com.trackasia.navigation.android.navigation.ui.v5.camera.NavigationCamera;
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.trackasia.navigation.android.navigation.ui.v5.route.OnRouteSelectionChangeListener;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.models.DirectionsRoute;
 import com.trackasia.geojson.Point;
 import com.trackasia.android.geometry.LatLng;
 import com.trackasia.android.location.LocationComponent;
@@ -38,8 +38,7 @@ import com.trackasia.android.style.sources.Source;
 import com.trackasia.android.style.sources.VectorSource;
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 import com.trackasia.navigation.android.navigation.ui.v5.ThemeSwitcher;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -202,7 +201,7 @@ public class NavigationTrackAsiaMap {
    * @param location to update the icon and query the map
    */
   public void updateLocation(Location location) {
-    locationComponent.forceLocationUpdate(location);
+    locationComponent.forceLocationUpdate(toAndroidLocation(location));
     updateMapWayNameWithLocation(location);
   }
 
@@ -732,7 +731,7 @@ public class NavigationTrackAsiaMap {
     if (mapWayName == null) {
       return;
     }
-    LatLng latLng = new LatLng(location);
+    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
     PointF mapPoint = trackAsiaMap.getProjection().toScreenLocation(latLng);
     mapWayName.updateWayNameWithPoint(mapPoint);
   }

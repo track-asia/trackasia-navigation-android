@@ -1,14 +1,38 @@
 ext {
-    navigationArtifactGroupId = 'io.github.track-asia'
-    navigationArtifactId = 'android'
-    navigationArtifactTitle = 'TrackAsia Navigation SDK for Android'
-    navigationArtifactDescription = 'TrackAsia Navigation SDK for Android'
-    navigationDeveloperName = 'TrackAsia'
-    navigationDeveloperId = 'trackasia'
-    navigationDeveloperMail = 'trackasia@track-asia.com'
-    navigationArtifactUrl = 'https://github.com/track-asia/trackasia-navigation-android'
+    trackAsiaDeveloperId = 'trackasia'
+    trackAsiaDeveloperName = 'TrackAsia'
+    trackAsiaDeveloperMail = 'team@track-asia.com'
+    trackAsiaDeveloperOrganization = 'TrackAsia'
+
+    navigationArtifactGroupId = 'com.trackasia.navigation'
+    navigationArtifactTitle = 'TrackAsia Navigation SDK'
+    navigationArtifactDescription = 'TrackAsia Navigation build on Kotlin Multiplatform'
+    navigationDeveloperOrganizationUrl = 'http://www.track-asia.com'
+    navigationArtifactUrl = 'https://github.com/trackasia/trackasia-navigation-android'
+    navigationArtifactVcsUrl = 'https://github.com/trackasia/trackasia-navigation-android.git'
     navigationArtifactScmUrl = 'scm:git@github.com:trackasia/trackasia-navigation-android.git'
     navigationArtifactLicenseName = 'MIT'
     navigationArtifactLicenseUrl = 'https://opensource.org/license/MIT'
-    versionName = project.hasProperty('VERSION_NAME') ? project.property('VERSION_NAME') : System.getenv('VERSION_NAME')
+
+    versionName = getVersionName()
+    isSnapshot = isSnapshot()
+}
+
+def getVersionName() {
+    def version = System.getenv('VERSION')
+    def deducedVersion = isSnapshot() ? getSnapshotVersion(version) : version
+    project.logger.info("Project version detected: ${deducedVersion}")
+    return deducedVersion
+}
+
+def isSnapshot() {
+    def snapshotProp = findProperty("snapshot")
+    return snapshotProp ? snapshotProp.asBoolean() : false
+}
+
+private static def getSnapshotVersion(String version) {
+    def matcher = version =~ /^[v|V](\d+).(\d+)?.*/
+    def major = (matcher[0][1] as Integer)
+    def minor = (matcher[0][2] as Integer) + 1
+    return "${major}.${minor}.0-SNAPSHOT"
 }

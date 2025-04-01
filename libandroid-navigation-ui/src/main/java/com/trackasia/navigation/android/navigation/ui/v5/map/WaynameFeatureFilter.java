@@ -1,6 +1,5 @@
 package com.trackasia.navigation.android.navigation.ui.v5.map;
 
-import android.location.Location;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -9,6 +8,7 @@ import com.trackasia.geojson.Geometry;
 import com.trackasia.geojson.LineString;
 import com.trackasia.geojson.MultiLineString;
 import com.trackasia.geojson.Point;
+import com.trackasia.navigation.core.location.Location;
 import com.trackasia.turf.TurfMeasurement;
 
 import java.util.ArrayList;

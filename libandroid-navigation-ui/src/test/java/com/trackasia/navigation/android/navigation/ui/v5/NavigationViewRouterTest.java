@@ -1,30 +1,28 @@
 package com.trackasia.navigation.android.navigation.ui.v5;
 
 import static junit.framework.Assert.assertNotNull;
+import static com.trackasia.geojson.common.CommonExtKt.toJvm;
+import static com.trackasia.navigation.android.navigation.ui.v5.GeoJsonExtKt.toJvmPoints;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.location.Location;
-
 import androidx.annotation.NonNull;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsWaypoint;
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions;
+import com.trackasia.navigation.core.location.Location;
+import com.trackasia.navigation.core.models.DirectionsResponse;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.DirectionsWaypoint;
+import com.trackasia.navigation.core.models.RouteOptions;
 import com.trackasia.geojson.Point;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 import org.junit.Test;
 import com.trackasia.navigation.android.navigation.ui.v5.route.TrackAsiaRouteFetcher;
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationRoute;
-import com.trackasia.navigation.android.navigation.v5.utils.Constants;
+import com.trackasia.navigation.core.utils.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -178,7 +176,7 @@ public class NavigationViewRouterTest extends BaseTest {
     }
 
     private Point findDestinationPoint(NavigationViewOptions options) {
-        List<Point> coordinates = options.directionsRoute().getRouteOptions().getCoordinates();
+        List<Point> coordinates = toJvmPoints(options.directionsRoute().getRouteOptions().getCoordinates());
         return coordinates.get(coordinates.size() - 1);
     }
 
@@ -197,16 +195,16 @@ public class NavigationViewRouterTest extends BaseTest {
     private RouteOptions buildRouteOptionsWithCoordinates(DirectionsResponse response) {
         List<Point> coordinates = new ArrayList<>();
         for (DirectionsWaypoint waypoint : response.getWaypoints()) {
-            coordinates.add(waypoint.getLocation());
+            coordinates.add(toJvm(waypoint.getLocation()));
         }
         return new RouteOptions.Builder(
             Constants.BASE_API_URL,
             "user",
             "profile",
-            coordinates,
-            ACCESS_TOKEN,
-            "uuid"
+            toJvmPoints(coordinates)
         )
+            .withAccessToken(ACCESS_TOKEN)
+            .withRequestUuid("uuid")
             .withGeometries("mocked_geometries")
             .build();
     }

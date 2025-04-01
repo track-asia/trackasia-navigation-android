@@ -1,7 +1,7 @@
 package com.trackasia.navigation.android.navigation.ui.v5.voice;
 
 import com.trackasia.navigation.android.navigation.ui.v5.voice.SpeechAnnouncement;
-import com.trackasia.navigation.android.navigation.v5.milestone.VoiceInstructionMilestone;
+import com.trackasia.navigation.core.milestone.VoiceInstructionMilestone;
 
 import org.junit.Test;
 

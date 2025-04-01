@@ -12,7 +12,7 @@ import com.trackasia.navigation.android.navigation.ui.v5.NavigationView;
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewModel;
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 import com.trackasia.navigation.android.navigation.ui.v5.alert.AlertView;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
 
 import timber.log.Timber;
 

@@ -2,15 +2,15 @@ package com.trackasia.navigation.android.navigation.ui.v5.map;
 
 import android.content.Context;
 
-import com.trackasia.navigation.android.navigation.v5.models.LegStep;
-import com.trackasia.navigation.android.navigation.v5.models.ManeuverModifier;
-import com.trackasia.navigation.android.navigation.v5.models.StepManeuver;
+import com.trackasia.navigation.core.models.LegStep;
+import com.trackasia.navigation.core.models.ManeuverModifier;
+import com.trackasia.navigation.core.models.StepManeuver;
 import com.trackasia.android.maps.MapView;
 import com.trackasia.navigation.android.navigation.ui.v5.camera.NavigationCamera;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigation;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteLegProgress;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteStepProgress;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigation;
+import com.trackasia.navigation.core.routeprogress.RouteLegProgress;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.routeprogress.RouteStepProgress;
 
 import org.junit.Test;
 

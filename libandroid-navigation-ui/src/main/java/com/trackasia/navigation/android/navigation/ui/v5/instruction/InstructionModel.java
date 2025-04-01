@@ -2,8 +2,8 @@ package com.trackasia.navigation.android.navigation.ui.v5.instruction;
 
 import android.text.SpannableString;
 
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
 
 public class InstructionModel {
 

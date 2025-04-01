@@ -2,7 +2,7 @@ package com.trackasia.navigation.android.navigation.ui.v5.instruction;
 
 import android.text.TextUtils;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerComponents;
+import com.trackasia.navigation.core.models.BannerComponents;
 
 class AbbreviationVerifier implements NodeVerifier {
   @Override

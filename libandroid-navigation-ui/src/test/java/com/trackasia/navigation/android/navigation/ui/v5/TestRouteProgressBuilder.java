@@ -1,19 +1,18 @@
 package com.trackasia.navigation.android.navigation.ui.v5;
 
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationHelper.createDistancesToIntersections;
-import static com.trackasia.navigation.android.navigation.v5.navigation.NavigationHelper.createIntersectionsList;
-import static com.trackasia.navigation.android.navigation.v5.utils.Constants.PRECISION_6;
-
-import android.util.Pair;
+import static com.trackasia.navigation.android.navigation.ui.v5.GeoJsonExtKt.toJvmPoints;
+import static com.trackasia.navigation.core.navigation.NavigationHelper.createDistancesToIntersections;
+import static com.trackasia.navigation.core.navigation.NavigationHelper.createIntersectionsList;
+import static com.trackasia.navigation.core.utils.Constants.PRECISION_6;
 
 import androidx.annotation.NonNull;
 
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute;
-import com.trackasia.navigation.android.navigation.v5.models.LegStep;
-import com.trackasia.navigation.android.navigation.v5.models.StepIntersection;
+import com.trackasia.navigation.core.models.DirectionsRoute;
+import com.trackasia.navigation.core.models.LegStep;
+import com.trackasia.navigation.core.models.StepIntersection;
 import com.trackasia.geojson.Point;
 import com.trackasia.geojson.utils.PolylineUtils;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
 
 import java.util.List;
 import java.util.Map;
@@ -45,14 +44,14 @@ class TestRouteProgressBuilder {
 
         List<StepIntersection> intersections = createIntersectionsList(currentStep, upcomingStep);
         Map<StepIntersection, Double> intersectionDistances = createDistancesToIntersections(
-            currentStepPoints, intersections
+            toJvmPoints(currentStepPoints), intersections
         );
 
         return new RouteProgress.Builder(
             route,
             legIndex,
             distanceRemaining,
-            currentStepPoints,
+            toJvmPoints(currentStepPoints),
             stepIndex,
             legDistanceRemaining,
             stepDistanceRemaining
@@ -71,6 +70,6 @@ class TestRouteProgressBuilder {
     }
 
     private List<Point> buildStepPointsFromGeometry(String stepGeometry) {
-        return PolylineUtils.decode(stepGeometry, PRECISION_6);
+        return toJvmPoints(PolylineUtils.decode(stepGeometry, PRECISION_6));
     }
 }

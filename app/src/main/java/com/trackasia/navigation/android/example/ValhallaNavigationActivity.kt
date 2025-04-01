@@ -20,10 +20,10 @@ import com.trackasia.android.maps.Style
 import com.trackasia.navigation.android.example.databinding.ActivityNavigationUiBinding
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationLauncher
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationLauncherOptions
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute
-import com.trackasia.navigation.android.navigation.v5.models.RouteOptions
-import com.trackasia.navigation.android.navigation.v5.navigation.*
+import com.trackasia.navigation.core.models.DirectionsResponse
+import com.trackasia.navigation.core.models.DirectionsRoute
+import com.trackasia.navigation.core.models.RouteOptions
+import com.trackasia.navigation.core.navigation.*
 import com.trackasia.turf.TurfConstants
 import com.trackasia.turf.TurfMeasurement
 import okhttp3.MediaType.Companion.toMediaType

@@ -19,12 +19,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationViewModel;
 import com.trackasia.navigation.android.navigation.ui.v5.R;
 import com.trackasia.navigation.android.navigation.ui.v5.ThemeSwitcher;
-import com.trackasia.navigation.android.navigation.v5.navigation.TrackAsiaNavigationOptions;
-import com.trackasia.navigation.android.navigation.v5.navigation.NavigationConstants;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.ProgressChangeListener;
-import com.trackasia.navigation.android.navigation.v5.routeprogress.RouteProgress;
-import com.trackasia.navigation.android.navigation.v5.utils.DistanceFormatter;
-import com.trackasia.navigation.android.navigation.v5.utils.LocaleUtils;
+import com.trackasia.navigation.core.models.UnitType;
+import com.trackasia.navigation.core.navigation.TrackAsiaNavigationOptions;
+import com.trackasia.navigation.core.navigation.NavigationConstants;
+import com.trackasia.navigation.core.routeprogress.ProgressChangeListener;
+import com.trackasia.navigation.core.routeprogress.RouteProgress;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.DistanceFormatter;
+import com.trackasia.navigation.android.navigation.ui.v5.utils.LocaleUtils;
 
 import java.text.DecimalFormat;
 
@@ -196,9 +197,8 @@ public class SummaryBottomSheet extends FrameLayout implements LifecycleObserver
   private void initializeDistanceFormatter() {
     LocaleUtils localeUtils = new LocaleUtils();
     String language = localeUtils.inferDeviceLanguage(getContext());
-    String unitType = localeUtils.getUnitTypeForDeviceLocale(getContext());
-    int roundingIncrement = NavigationConstants.ROUNDING_INCREMENT_FIFTY;
-    distanceFormatter = new DistanceFormatter(getContext(), language, unitType, roundingIncrement);
+    UnitType unitType = localeUtils.getUnitTypeForDeviceLocale(getContext());
+    distanceFormatter = new DistanceFormatter(getContext(), language, unitType, TrackAsiaNavigationOptions.RoundingIncrement.ROUNDING_INCREMENT_FIFTY);
   }
 
   /**

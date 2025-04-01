@@ -7,10 +7,10 @@ import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.widget.TextView;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerComponents;
-import com.trackasia.navigation.android.navigation.v5.models.BannerInstructions;
-import com.trackasia.navigation.android.navigation.v5.models.BannerText;
-import com.trackasia.navigation.android.navigation.v5.models.LegStep;
+import com.trackasia.navigation.core.models.BannerComponents;
+import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.BannerText;
+import com.trackasia.navigation.core.models.LegStep;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

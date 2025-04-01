@@ -1,20 +1,16 @@
 package com.trackasia.navigation.android.navigation.ui.v5.map;
 
 import android.graphics.PointF;
-import android.location.Location;
 import androidx.annotation.NonNull;
 
 import com.trackasia.geojson.Feature;
 import com.trackasia.geojson.Point;
+import com.trackasia.navigation.core.location.Location;
 import com.trackasia.android.style.layers.PropertyValue;
 import com.trackasia.android.style.layers.SymbolLayer;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.trackasia.navigation.android.navigation.ui.v5.map.MapPaddingAdjustor;
-import com.trackasia.navigation.android.navigation.ui.v5.map.MapWayName;
-import com.trackasia.navigation.android.navigation.ui.v5.map.OnWayNameChangedListener;
-import com.trackasia.navigation.android.navigation.ui.v5.map.WaynameFeatureFinder;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;

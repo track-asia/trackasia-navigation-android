@@ -5,8 +5,8 @@ import android.text.Spannable;
 import android.text.style.ImageSpan;
 import android.widget.TextView;
 
-import com.trackasia.navigation.android.navigation.v5.models.BannerComponents;
-import com.trackasia.navigation.android.navigation.v5.models.BannerText;
+import com.trackasia.navigation.core.models.BannerComponents;
+import com.trackasia.navigation.core.models.BannerText;
 import com.squareup.picasso.Picasso;
 
 /**

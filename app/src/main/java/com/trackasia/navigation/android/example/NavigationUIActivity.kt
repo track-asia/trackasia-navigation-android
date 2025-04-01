@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsResponse
+import com.trackasia.navigation.core.models.DirectionsResponse
 import com.trackasia.geojson.Point
 import com.trackasia.android.annotations.MarkerOptions
 import com.trackasia.android.camera.CameraPosition
@@ -21,13 +21,13 @@ import com.trackasia.android.maps.Style
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationLauncher
 import com.trackasia.navigation.android.navigation.ui.v5.NavigationLauncherOptions
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationRoute
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsCriteria
-import com.trackasia.navigation.android.navigation.v5.models.DirectionsRoute
+import com.trackasia.navigation.core.models.DirectionsRoute
 import com.trackasia.turf.TurfConstants
 import com.trackasia.turf.TurfMeasurement
 import okhttp3.Request
 import com.trackasia.navigation.android.example.databinding.ActivityNavigationUiBinding
 import com.trackasia.navigation.android.navigation.ui.v5.route.NavigationMapRoute
+import com.trackasia.navigation.core.models.UnitType
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -185,7 +185,7 @@ class NavigationUIActivity :
             this.accessToken(getString(R.string.mapbox_access_token))
             this.origin(origin)
             this.destination(destination)
-            this.voiceUnits(DirectionsCriteria.METRIC)
+            this.voiceUnits(UnitType.METRIC)
             this.alternatives(true)
             // If you are using this with the GraphHopper Directions API, you need to uncomment user and profile here.
             //this.user("gh")
