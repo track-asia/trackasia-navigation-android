@@ -252,12 +252,22 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
       if (instructions == null || instructions.getPrimary() == null) {
         return;
       }
+      
       BannerText primary = instructions.getPrimary();
-      String primaryManeuverModifier = primary.getModifier().getText();
-      String drivingSide = currentStep.getDrivingSide();
-      updateManeuverView(primary.getType().getText(), primaryManeuverModifier, primary.getDegrees(), drivingSide);
+      String primaryManeuverModifier = null;
+      if (primary.getModifier() != null) {
+        primaryManeuverModifier = primary.getModifier().getText();
+      }
+      
+      String drivingSide = currentStep != null ? currentStep.getDrivingSide() : "";
+      String maneuverType = primary.getType() != null ? primary.getType().getText() : "";
+      
+      updateManeuverView(maneuverType, primaryManeuverModifier, primary.getDegrees(), drivingSide);
       updateDataFromBannerText(primary, instructions.getSecondary());
-      updateSubStep(instructions.getSub(), primaryManeuverModifier);
+      
+      if (instructions.getSub() != null) {
+        updateSubStep(instructions.getSub(), primaryManeuverModifier);
+      }
     }
   }
 
@@ -581,30 +591,43 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
   }
 
   private void updateSubStep(BannerText subText, String primaryManeuverModifier) {
-    if (shouldShowSubStep(subText)) {
-      String maneuverType = subText.getType().getText();
-      String maneuverModifier = subText.getModifier().getText();
-      subManeuverView.setManeuverTypeAndModifier(maneuverType, maneuverModifier);
-      Double roundaboutAngle = subText.getDegrees();
-      if (roundaboutAngle != null) {
-        subManeuverView.setRoundaboutAngle(roundaboutAngle.floatValue());
+    try {
+      if (shouldShowSubStep(subText)) {
+        String maneuverType = subText.getType().getText();
+        String maneuverModifier = subText.getModifier() != null ? subText.getModifier().getText() : null;
+        subManeuverView.setManeuverTypeAndModifier(maneuverType, maneuverModifier);
+        
+        // Khôi phục xử lý roundaboutAngle
+        Double roundaboutAngle = subText.getDegrees();
+        if (roundaboutAngle != null) {
+          subManeuverView.setRoundaboutAngle(roundaboutAngle.floatValue());
+        }
+        
+        // Khôi phục xử lý drivingSide
+        String drivingSide = currentStep.getDrivingSide();
+        subManeuverView.setDrivingSide(drivingSide);
+        
+        // Khôi phục xử lý instructionLoader
+        InstructionLoader instructionLoader = createInstructionLoader(subStepText, subText);
+        if (instructionLoader != null) {
+          instructionLoader.loadInstruction();
+        }
+        
+        showSubLayout();
+      } else {
+        hideSubLayout();
       }
-      String drivingSide = currentStep.getDrivingSide();
-      subManeuverView.setDrivingSide(drivingSide);
-      InstructionLoader instructionLoader = createInstructionLoader(subStepText, subText);
-      if (instructionLoader != null) {
-        instructionLoader.loadInstruction();
+      
+      // Khôi phục xử lý turnLanes
+      if (shouldShowTurnLanes(subText, primaryManeuverModifier)) {
+        turnLaneAdapter.addTurnLanes(subText.getComponents(), primaryManeuverModifier);
+        showTurnLanes();
+      } else {
+        hideTurnLanes();
       }
-      showSubLayout();
-      return;
-    } else {
+    } catch (Exception e) {
+      android.util.Log.e("InstructionView", "Error updating sub step: " + e.getMessage());
       hideSubLayout();
-    }
-
-    if (shouldShowTurnLanes(subText, primaryManeuverModifier)) {
-      turnLaneAdapter.addTurnLanes(subText.getComponents(), primaryManeuverModifier);
-      showTurnLanes();
-    } else {
       hideTurnLanes();
     }
   }
@@ -781,5 +804,45 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
     boolean isListShowing = instructionListLayout.getVisibility() == VISIBLE;
     rvInstructions.stopScroll();
     instructionListAdapter.updateBannerListWith(routeProgress, isListShowing);
+  }
+
+  private void updateBannerInstructions(BannerInstructions instructions) {
+    if (instructions == null || instructions.getPrimary() == null) {
+      return;
+    }
+    BannerText primary = instructions.getPrimary();
+    updatePrimaryText(primary);
+    updateManeuverViewSafely(primary);
+    if (instructions.getSub() != null) {
+      updateSecondaryText(instructions.getSub());
+    }
+  }
+
+  private void updateManeuverViewSafely(BannerText primary) {
+    try {
+      String maneuverType = primary.getType() != null ? primary.getType().getText() : "";
+      String primaryManeuverModifier = null;
+      if (primary.getModifier() != null) {
+        primaryManeuverModifier = primary.getModifier().getText();
+      }
+      Double degrees = primary.getDegrees();
+      String drivingSide = currentStep != null ? currentStep.getDrivingSide() : "";
+      
+      updateManeuverView(maneuverType, primaryManeuverModifier, degrees, drivingSide);
+    } catch (Exception e) {
+      android.util.Log.e("InstructionView", "Error updating maneuver view: " + e.getMessage());
+    }
+  }
+
+  private void updatePrimaryText(BannerText primary) {
+    upcomingPrimaryText.setMaxLines(2);
+    upcomingSecondaryText.setVisibility(GONE);
+    adjustBannerTextVerticalBias(0.5f);
+    loadTextWith(primary, upcomingPrimaryText);
+  }
+
+  private void updateSecondaryText(BannerText secondary) {
+    upcomingSecondaryText.setVisibility(VISIBLE);
+    loadTextWith(secondary, upcomingSecondaryText);
   }
 }

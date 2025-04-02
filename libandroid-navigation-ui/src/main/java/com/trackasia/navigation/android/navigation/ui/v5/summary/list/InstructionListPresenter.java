@@ -5,6 +5,7 @@ import android.text.SpannableString;
 import android.view.View;
 
 import com.trackasia.navigation.core.models.BannerInstructions;
+import com.trackasia.navigation.core.models.BannerText;
 import com.trackasia.navigation.core.models.LegStep;
 import com.trackasia.navigation.core.models.ManeuverModifier;
 import com.trackasia.navigation.core.models.RouteLeg;
@@ -100,19 +101,29 @@ class InstructionListPresenter {
   }
 
   private void updateManeuverView(@NonNull InstructionListView listView, BannerInstructions bannerInstructions) {
-    StepManeuver.Type maneuverType = bannerInstructions.getPrimary().getType();
-    if (maneuverType == null) {
-      return;
-    }
+    try {
+      BannerText primary = bannerInstructions.getPrimary();
+      if (primary == null) {
+        return;
+      }
 
-    ManeuverModifier.Type maneuverModifier = bannerInstructions.getPrimary().getModifier();
-    listView.updateManeuverViewTypeAndModifier(maneuverType.getText(), maneuverModifier != null ? maneuverModifier.getText() : null);
+      StepManeuver.Type maneuverType = primary.getType();
+      String typeText = (maneuverType != null) ? maneuverType.getText() : "";
+      
+      ManeuverModifier.Type maneuverModifier = primary.getModifier();
+      String modifierText = (maneuverModifier != null) ? maneuverModifier.getText() : null;
+      
+      listView.updateManeuverViewTypeAndModifier(typeText, modifierText);
 
-    Double roundaboutDegrees = bannerInstructions.getPrimary().getDegrees();
-    if (roundaboutDegrees != null) {
-      listView.updateManeuverViewRoundaboutDegrees(roundaboutDegrees.floatValue());
+      Double roundaboutDegrees = primary.getDegrees();
+      if (roundaboutDegrees != null) {
+        listView.updateManeuverViewRoundaboutDegrees(roundaboutDegrees.floatValue());
+      }
+      
+      listView.updateManeuverViewDrivingSide(drivingSide);
+    } catch (Exception e) {
+      android.util.Log.e("InstructionListPresenter", "Error updating maneuver view: " + e.getMessage());
     }
-    listView.updateManeuverViewDrivingSide(drivingSide);
   }
 
   private void addBannerInstructions(RouteProgress routeProgress) {

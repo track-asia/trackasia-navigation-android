@@ -49,6 +49,11 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
             ValhallaNavigationActivity.class
         ));
         list.add(new SampleItem(
+            getString(R.string.title_trackasia_navigation),
+            getString(R.string.description_trackasia_navigation),
+            TrackAsiaNavigationActivity.class
+        ));
+        list.add(new SampleItem(
             getString(R.string.title_navigation_ui),
             getString(R.string.description_navigation_ui),
             NavigationUIActivity.class

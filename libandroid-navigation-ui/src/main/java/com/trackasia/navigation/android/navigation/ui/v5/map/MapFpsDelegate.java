@@ -111,11 +111,30 @@ class MapFpsDelegate implements OnTrackingModeChangedListener, OnTrackingModeTra
   }
 
   private boolean validLowFpsManeuver(RouteLegProgress routeLegProgress) {
-    final String maneuverModifier = routeLegProgress.getCurrentStep().getManeuver().getModifier().getText();
-    return maneuverModifier != null
-      && (maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_STRAIGHT)
-      || maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_SLIGHT_LEFT)
-      || maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_SLIGHT_RIGHT));
+    try {
+      if (routeLegProgress == null 
+          || routeLegProgress.getCurrentStep() == null 
+          || routeLegProgress.getCurrentStep().getManeuver() == null) {
+        return false;
+      }
+      
+      com.trackasia.navigation.core.models.ManeuverModifier.Type modifier = 
+          routeLegProgress.getCurrentStep().getManeuver().getModifier();
+      
+      if (modifier == null) {
+        return false;
+      }
+      
+      final String maneuverModifier = modifier.getText();
+      
+      return maneuverModifier != null
+        && (maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_STRAIGHT)
+        || maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_SLIGHT_LEFT)
+        || maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_SLIGHT_RIGHT));
+    } catch (Exception e) {
+      android.util.Log.e("MapFpsDelegate", "Error in validLowFpsManeuver: " + e.getMessage());
+      return false;
+    }
   }
 
   private boolean validLowFpsDuration(RouteLegProgress routeLegProgress) {
