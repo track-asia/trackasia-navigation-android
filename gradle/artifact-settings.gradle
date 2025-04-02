@@ -19,10 +19,26 @@ ext {
 }
 
 def getVersionName() {
+    // Try to read from VERSION file first
+    def versionFile = new File("${rootDir}/VERSION")
+    if (versionFile.exists()) {
+        def versionFromFile = versionFile.text.trim()
+        project.logger.info("Version read from VERSION file: ${versionFromFile}")
+        return versionFromFile
+    }
+    
+    // Fall back to environment variable if file doesn't exist
     def version = System.getenv('VERSION')
-    def deducedVersion = isSnapshot() ? getSnapshotVersion(version) : version
-    project.logger.info("Project version detected: ${deducedVersion}")
-    return deducedVersion
+    if (version) {
+        def deducedVersion = isSnapshot() ? getSnapshotVersion(version) : version
+        project.logger.info("Version from environment variable: ${deducedVersion}")
+        return deducedVersion
+    }
+    
+    // Default version if neither source is available
+    def defaultVersion = "0.0.0"
+    project.logger.warn("No version found in VERSION file or environment. Using default: ${defaultVersion}")
+    return defaultVersion
 }
 
 def isSnapshot() {

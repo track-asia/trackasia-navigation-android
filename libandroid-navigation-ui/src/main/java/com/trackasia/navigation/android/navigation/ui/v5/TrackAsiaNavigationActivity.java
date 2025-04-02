@@ -90,12 +90,24 @@ public class TrackAsiaNavigationActivity extends AppCompatActivity implements On
 
   @Override
   public void onNavigationReady(boolean isRunning) {
-    NavigationViewOptions.Builder options = NavigationViewOptions.builder();
-    options.navigationListener(this);
-    extractRoute(options);
-    extractConfiguration(options);
-    options.navigationOptions(new TrackAsiaNavigationOptions());
-    navigationView.startNavigation(options.build());
+    try {
+      NavigationViewOptions.Builder options = NavigationViewOptions.builder();
+      options.navigationListener(this);
+      
+      DirectionsRoute route = extractRoute(options);
+      if (route == null) {
+        android.util.Log.e("TrackAsiaNavigationActivity", "Failed to extract route, cannot start navigation");
+        finish();
+        return;
+      }
+      
+      extractConfiguration(options);
+      options.navigationOptions(new TrackAsiaNavigationOptions());
+      navigationView.startNavigation(options.build());
+    } catch (Exception e) {
+      android.util.Log.e("TrackAsiaNavigationActivity", "Error starting navigation: " + e.getMessage());
+      finish();
+    }
   }
 
   @Override
@@ -122,9 +134,12 @@ public class TrackAsiaNavigationActivity extends AppCompatActivity implements On
     }
   }
 
-  private void extractRoute(NavigationViewOptions.Builder options) {
+  private DirectionsRoute extractRoute(NavigationViewOptions.Builder options) {
     DirectionsRoute route = NavigationLauncher.extractRoute(this);
-    options.directionsRoute(route);
+    if (route != null) {
+      options.directionsRoute(route);
+    }
+    return route;
   }
 
   private void extractConfiguration(NavigationViewOptions.Builder options) {

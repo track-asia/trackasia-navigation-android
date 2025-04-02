@@ -248,25 +248,36 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
    */
   public void updateBannerInstructionsWith(Milestone milestone) {
     if (milestone instanceof BannerInstructionMilestone) {
-      BannerInstructions instructions = ((BannerInstructionMilestone) milestone).getBannerInstructions();
-      if (instructions == null || instructions.getPrimary() == null) {
-        return;
-      }
-      
-      BannerText primary = instructions.getPrimary();
-      String primaryManeuverModifier = null;
-      if (primary.getModifier() != null) {
-        primaryManeuverModifier = primary.getModifier().getText();
-      }
-      
-      String drivingSide = currentStep != null ? currentStep.getDrivingSide() : "";
-      String maneuverType = primary.getType() != null ? primary.getType().getText() : "";
-      
-      updateManeuverView(maneuverType, primaryManeuverModifier, primary.getDegrees(), drivingSide);
-      updateDataFromBannerText(primary, instructions.getSecondary());
-      
-      if (instructions.getSub() != null) {
-        updateSubStep(instructions.getSub(), primaryManeuverModifier);
+      try {
+        BannerInstructions instructions = ((BannerInstructionMilestone) milestone).getBannerInstructions();
+        if (instructions == null || instructions.getPrimary() == null) {
+          return;
+        }
+        
+        BannerText primary = instructions.getPrimary();
+        
+        // Safely handle null type and modifier
+        String maneuverType = "";
+        if (primary.getType() != null) {
+          maneuverType = primary.getType().getText();
+        }
+        
+        String primaryManeuverModifier = null;
+        if (primary.getModifier() != null) {
+          primaryManeuverModifier = primary.getModifier().getText();
+        }
+        
+        String drivingSide = currentStep != null ? currentStep.getDrivingSide() : "";
+        
+        updateManeuverView(maneuverType, primaryManeuverModifier, primary.getDegrees(), drivingSide);
+        updateDataFromBannerText(primary, instructions.getSecondary());
+        
+        BannerText subBannerText = instructions.getSub();
+        if (subBannerText != null) {
+          updateSubStep(subBannerText, primaryManeuverModifier);
+        }
+      } catch (Exception e) {
+        android.util.Log.e("InstructionView", "Error updating banner instructions: " + e.getMessage());
       }
     }
   }
@@ -593,21 +604,29 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
   private void updateSubStep(BannerText subText, String primaryManeuverModifier) {
     try {
       if (shouldShowSubStep(subText)) {
-        String maneuverType = subText.getType().getText();
-        String maneuverModifier = subText.getModifier() != null ? subText.getModifier().getText() : null;
+        String maneuverType = "";
+        if (subText.getType() != null) {
+          maneuverType = subText.getType().getText();
+        }
+        
+        String maneuverModifier = null;
+        if (subText.getModifier() != null) {
+          maneuverModifier = subText.getModifier().getText();
+        }
+        
         subManeuverView.setManeuverTypeAndModifier(maneuverType, maneuverModifier);
         
-        // Khôi phục xử lý roundaboutAngle
+        // Handle roundaboutAngle safely
         Double roundaboutAngle = subText.getDegrees();
         if (roundaboutAngle != null) {
           subManeuverView.setRoundaboutAngle(roundaboutAngle.floatValue());
         }
         
-        // Khôi phục xử lý drivingSide
-        String drivingSide = currentStep.getDrivingSide();
+        // Handle drivingSide safely
+        String drivingSide = currentStep != null ? currentStep.getDrivingSide() : "";
         subManeuverView.setDrivingSide(drivingSide);
         
-        // Khôi phục xử lý instructionLoader
+        // Handle instructionLoader safely
         InstructionLoader instructionLoader = createInstructionLoader(subStepText, subText);
         if (instructionLoader != null) {
           instructionLoader.loadInstruction();
@@ -618,7 +637,7 @@ public class InstructionView extends RelativeLayout implements LifecycleObserver
         hideSubLayout();
       }
       
-      // Khôi phục xử lý turnLanes
+      // Handle turnLanes safely
       if (shouldShowTurnLanes(subText, primaryManeuverModifier)) {
         turnLaneAdapter.addTurnLanes(subText.getComponents(), primaryManeuverModifier);
         showTurnLanes();

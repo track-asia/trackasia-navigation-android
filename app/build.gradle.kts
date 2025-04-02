@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId = "com.trackasia.navigation.android.example"
         compileSdk = 34
-        minSdk = 21
+        minSdk = 23
 
         versionCode = 1
         versionName = project.properties.get("versionName") as String? ?: "0.0.0"
@@ -68,6 +68,7 @@ android {
 
 dependencies {
     implementation(project(":libandroid-navigation-ui"))
+    implementation(project(":trackasia-navigation-core"))
 
     implementation(libs.trackasia) {
         // Exclude old version of GeoJSON libs
@@ -77,6 +78,8 @@ dependencies {
     }
 
     // Support libraries
+    implementation(libs.trackasia.geojson)
+    implementation(libs.trackasia.geojson.turf)
     implementation(libs.material)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.constraintlayout)
