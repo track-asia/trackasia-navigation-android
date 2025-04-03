@@ -4,3 +4,4 @@ ext["signing.secretKeyRingFile"] = "${projectDir}/../signing-key.gpg"
 ext["ossrhUsername"] = System.getenv('OSSRH_USERNAME')
 ext["ossrhPassword"] = System.getenv('OSSRH_PASSWORD')
 ext["sonatypeStagingProfileId"] = System.getenv('SONATYPE_STAGING_PROFILE_ID')
+

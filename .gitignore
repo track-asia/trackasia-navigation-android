@@ -15,3 +15,6 @@ build/
 
 #MacOS
 .DS_Store
+.history/
+deploy-to-maven.sh
+cleanup-metadata.sh

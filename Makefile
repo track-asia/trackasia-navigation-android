@@ -3,6 +3,10 @@ export RENDERER ?= drawable
 export IS_LOCAL_DEVELOPMENT ?= true
 export TARGET_BRANCH ?= main
 
+# Đọc phiên bản từ file VERSION nếu tồn tại
+VERSION_FILE := $(shell if [ -f VERSION ]; then cat VERSION; fi)
+VERSION_NAME := $(VERSION_FILE)
+
 CMAKE ?= cmake
 
 
@@ -63,6 +67,16 @@ android-style-code:
 	node scripts/generate-style-code.js
 style-code: android-style-code
 
+# Kiểm tra các lệnh sed trong Makefile và thay thế
+ifeq ($(shell uname -s), Darwin)
+	# Cho macOS, sử dụng phiên bản sed phù hợp
+	SED_CMD = sed -E
+else
+	# Cho Linux và các hệ điều hành khác
+	SED_CMD = sed
+endif
+
+# Tách các định nghĩa trong target dưới đây
 define ANDROID_RULES
 # $1 = arm-v7 (short arch)
 # $2 = armeabi-v7a (internal arch)
@@ -104,7 +118,7 @@ run-android-core-test-$1-%: android-core-test-$1
 	adb push TrackAsiaAndroid/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-test $(MLN_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 
 # Create gtest filter for skipped tests.
-	$(eval SKIPPED_TESTS := -$(shell sed -n '/#\|^$$/!p' tests/skipped.txt | sed ':a;$!N;s/\n/:/g;ta'))
+	$(eval SKIPPED_TESTS := -$(shell grep -v "^#" tests/skipped.txt | grep -v "^$$" | paste -sd ":" -))
 
 	# Kick off the tests
 	adb shell "export LD_LIBRARY_PATH=$(MLN_ANDROID_LOCAL_WORK_DIR) && cd $(MLN_ANDROID_LOCAL_WORK_DIR) && chmod +x mbgl-test && ./mbgl-test --class_path=$(MLN_ANDROID_LOCAL_WORK_DIR)/classes.dex --gtest_filter=$$*:$(SKIPPED_TESTS)"
@@ -244,241 +258,620 @@ android-ui-test:
 run-android-test-app-center:
 	appcenter test run espresso --app "TrackAsia-mobile/Maps-sdk" --devices "TrackAsia-mobile/${devices}" --app-path TrackAsiaAndroidTestApp/build/outputs/apk/debug/TrackAsiaAndroidTestApp-debug.apk  --test-series "master" --locale "en_US" --build-dir TrackAsiaAndroidTestApp/build/outputs/apk/androidTest/debug --token ${APPCENTER_ACCESS_TOKEN}
 
-# Uploads the compiled Android SDK to Maven Central Staging
-.PHONY: run-android-publish
-run-android-publish:
-	@echo "Publishing to Maven Central with version $(VERSION_NAME) from VERSION file"
-	$(MLN_ANDROID_GRADLE_SINGLE_JOB) -PversionName=$(VERSION_NAME) -Ptrackasia.abis=all :TrackAsiaAndroid:publishAllPublicationsToSonatypeRepository closeAndReleaseSonatypeStagingRepository
 
-.PHONY: run-android-local-publish
-run-android-local-publish:
-	@echo "Publishing to Maven Local with version $(VERSION_NAME) from VERSION file"
-	./gradlew -PversionName=$(VERSION_NAME) publishToMavenLocal
-
-
-# Dump system graphics information for the test app
-.PHONY: android-gfxinfo
-android-gfxinfo:
-	adb shell dumpsys gfxinfo com.trackasia.testapp reset
-
-# Runs checkstyle and lint on the java code
-.PHONY: android-check
-android-check : android-ktlint android-checkstyle android-lint-sdk android-lint-test-app run-android-nitpick
-
-# Runs checkstyle on the java code
-.PHONY: android-checkstyle
-android-checkstyle:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none :TrackAsiaAndroid:checkstyle :TrackAsiaAndroidTestApp:checkstyle
-
-# Runs checkstyle on the kotlin code
-.PHONY: android-ktlint
-android-ktlint:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none checkstyle
-
-# Runs lint on the Android SDK java code
-.PHONY: android-lint-sdk
-android-lint-sdk:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none :TrackAsiaAndroid:lint
-
-# Runs lint on the Android test app java code
-.PHONY: android-lint-test-app
-android-lint-test-app:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none :TrackAsiaAndroidTestApp:lint
-
-# Generates LICENSE.md file based on all Android project dependencies
-.PHONY: android-license
-android-license:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none :TrackAsiaAndroid:licenseDrawableReleaseReport
-	python3 scripts/generate-license.py
-
-# Symbolicate ndk stack traces for the arm-v7 abi
-.PHONY: android-ndk-stack
-android-ndk-stack: android-ndk-stack-arm-v7
-
-# Run android nitpick script
-.PHONY: run-android-nitpick
-run-android-nitpick:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none androidNitpick
-
-# Creates a dependency graph using Graphviz
-.PHONY: android-graph
-android-graph:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=none :TrackAsiaAndroid:generateDependencyGraphMapboxLibraries
-
-# Lists tasks
-.PHONY: list-tasks
-list-tasks:
-	$(MLN_ANDROID_GRADLE) -Ptrackasia.abis=all tasks
-
-#### Miscellaneous targets #####################################################
-
-.PHONY: clean
-clean:
-	-rm -rf ./TrackAsiaAndroid/build \
-	        ./TrackAsiaAndroid/.externalNativeBuild \
-	        ./TrackAsiaAndroidTestApp/build \
-	        ./TrackAsiaAndroidTestApp/src/androidTest/java/com/trackasia/android/testapp/activity/gen \
-	        ./TrackAsiaAndroid/src/main/assets \
-		    ./TrackAsiaAndroidTestApp/src/main/assets/integration
-
-### MkDocs Documentation ########################################################
-
-.PHONY: mkdocs
-mkdocs:
-	docker build -t squidfunk/mkdocs-material docs
-	docker run --rm -it -p 8000:8000 -v ${PWD}:/docs squidfunk/mkdocs-material
-
-.PHONY: mkdocs-build
-mkdocs-build:
-	docker build -t squidfunk/mkdocs-material docs
-	docker run --rm -v ${PWD}:/docs squidfunk/mkdocs-material build --strict
-
-# Read version from VERSION file
-VERSION_NAME := $(shell cat VERSION 2>/dev/null || echo "0.0.0")
-
-checksums:
-	cd ~/.m2/repository/io/github/track-asia/libandroid-navigation/$(VERSION_NAME)/ && \
-	md5sum libandroid-navigation-$(VERSION_NAME).pom | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME).pom.md5 && \
-	md5sum libandroid-navigation-$(VERSION_NAME).aar | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME).aar.md5 && \
-	md5sum libandroid-navigation-$(VERSION_NAME)-sources.jar | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME)-sources.jar.md5 && \
-	md5sum libandroid-navigation-$(VERSION_NAME).module | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME).module.md5 && \
-	md5sum libandroid-navigation-$(VERSION_NAME)-javadoc.jar | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME)-javadoc.jar.md5 && \
-	sha1sum libandroid-navigation-$(VERSION_NAME).pom | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME).pom.sha1 && \
-	sha1sum libandroid-navigation-$(VERSION_NAME).aar | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME).aar.sha1 && \
-	sha1sum libandroid-navigation-$(VERSION_NAME).module | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME).module.sha1 && \
-	sha1sum libandroid-navigation-$(VERSION_NAME)-sources.jar | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME)-sources.jar.sha1 && \
-	sha1sum libandroid-navigation-$(VERSION_NAME)-javadoc.jar | cut -d ' ' -f 1 > libandroid-navigation-$(VERSION_NAME)-javadoc.jar.sha1
-
-checksums2:
-	cd ~/.m2/repository/io/github/track-asia/libandroid-navigation-ui/$(VERSION_NAME)/ && \
-	md5sum libandroid-navigation-ui-$(VERSION_NAME).pom | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME).pom.md5 && \
-	md5sum libandroid-navigation-ui-$(VERSION_NAME).aar | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME).aar.md5 && \
-	md5sum libandroid-navigation-ui-$(VERSION_NAME)-sources.jar | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME)-sources.jar.md5 && \
-	md5sum libandroid-navigation-ui-$(VERSION_NAME).module | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME).module.md5 && \
-	md5sum libandroid-navigation-ui-$(VERSION_NAME)-javadoc.jar | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME)-javadoc.jar.md5 && \
-	sha1sum libandroid-navigation-ui-$(VERSION_NAME).pom | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME).pom.sha1 && \
-	sha1sum libandroid-navigation-ui-$(VERSION_NAME).aar | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME).aar.sha1 && \
-	sha1sum libandroid-navigation-ui-$(VERSION_NAME).module | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME).module.sha1 && \
-	sha1sum libandroid-navigation-ui-$(VERSION_NAME)-sources.jar | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME)-sources.jar.sha1 && \
-	sha1sum libandroid-navigation-ui-$(VERSION_NAME)-javadoc.jar | cut -d ' ' -f 1 > libandroid-navigation-ui-$(VERSION_NAME)-javadoc.jar.sha1
-
-# Publish all artifacts to Maven Local repository (for local testing)
-.PHONY: publish-to-maven-local
-publish-to-maven-local:
-	@echo "Publishing with version $(VERSION_NAME) from VERSION file"
-	./gradlew -PversionName=$(VERSION_NAME) publishToMavenLocal
-
-# Generate and sign the application using MD5 and SHA1
-.PHONY: sign-artifacts
-sign-artifacts:
-	@echo "Generating MD5 digests for all artifacts..."
-	find ~/.m2/repository/com/trackasia/navigation -name "*.jar" | while read file; do md5sum "$$file" > "$$file.md5"; done
-	find ~/.m2/repository/com/trackasia/navigation -name "*.aar" | while read file; do md5sum "$$file" > "$$file.md5"; done
-	find ~/.m2/repository/com/trackasia/navigation -name "*.pom" | while read file; do md5sum "$$file" > "$$file.md5"; done
+# Ký tất cả các artifact đã tạo ra
+.PHONY: sign-all-artifacts
+sign-all-artifacts:
+	@echo "🔏 Ký tất cả các artifact..."
+	@if [ -z "$(GPG_KEY_ID)" ]; then \
+		echo "❌ Vui lòng cung cấp ID khóa GPG bằng cách thêm GPG_KEY_ID=<id_khóa>"; \
+		exit 1; \
+	fi
 	
-	@echo "Generating SHA1 digests for all artifacts..."
-	find ~/.m2/repository/com/trackasia/navigation -name "*.jar" | while read file; do shasum "$$file" > "$$file.sha1"; done
-	find ~/.m2/repository/com/trackasia/navigation -name "*.aar" | while read file; do shasum "$$file" > "$$file.sha1"; done
-	find ~/.m2/repository/com/trackasia/navigation -name "*.pom" | while read file; do shasum "$$file" > "$$file.sha1"; done
+	@echo "📋 Kiểm tra khóa GPG $(GPG_KEY_ID)..."
+	@if ! gpg --list-keys $(GPG_KEY_ID) > /dev/null 2>&1; then \
+		echo "❌ Không tìm thấy khóa GPG $(GPG_KEY_ID) trên hệ thống"; \
+		exit 1; \
+	fi
 	
-	@echo "Signing completed successfully."
+	@echo "🔍 Tìm các file để ký..."
+	@VERSION=$(shell echo $(VERSION_NAME) | cut -d '=' -f 2)
+	@echo "   Phiên bản: $$VERSION"
+	@find ~/.m2/repository/io/github/track-asia -type f > .temp_files.txt
+	@grep -v "\.md5$$" .temp_files.txt | grep -v "\.sha1$$" | grep -v "\.asc$$" | grep -v "maven-metadata" > .temp_files_to_sign.txt
+	@TOTAL_FILES=$$(cat .temp_files_to_sign.txt | wc -l | tr -d ' \n\t')
+	
+	@if [ "$$TOTAL_FILES" = "0" ]; then \
+		echo "❌ Không tìm thấy file nào để ký. Vui lòng chạy 'make run-android-local-publish' trước."; \
+		rm -f .temp_files.txt .temp_files_to_sign.txt; \
+		exit 1; \
+	fi
+	
+	@echo "Đã tìm thấy $$TOTAL_FILES file cần ký. Bắt đầu quá trình ký..."
+	
+	@COUNT=0
+	@cat .temp_files_to_sign.txt | while read file; do \
+		COUNT=$$((COUNT+1)); \
+		echo "[$${COUNT}/$$TOTAL_FILES] Đang ký: $$(basename $$file)"; \
+		\
+		md5sum "$$file" | cut -d ' ' -f 1 > "$$file.md5"; \
+		chmod 644 "$$file.md5"; \
+		\
+		sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
+		chmod 644 "$$file.sha1"; \
+		\
+		gpg --batch --yes --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+		\
+		chmod 644 "$$file.asc"; \
+	done
+	
+	@echo ""
+	@echo "📊 Tổng kết:"
+	@echo "  • Đã ký $$TOTAL_FILES file."
+	@echo "  • Quá trình ký hoàn tất."
+	
+	@rm -f .temp_files.txt .temp_files_to_sign.txt
+	@echo "✅ Hoàn tất quá trình ký."
 
-# Publish to Maven Local and sign all artifacts
-.PHONY: publish-local-signed
-publish-local-signed: publish-to-maven-local sign-artifacts
-	@echo "Published and signed all artifacts to Maven Local repository with version $(VERSION_NAME)"
+# Mục tiêu mới để ký tất cả các file iOS
+.PHONY: sign-ios-files
+sign-ios-files:
+	@echo "🔏 Ký các file iOS..."
+	@if [ -z "$(GPG_KEY_ID)" ]; then \
+		echo "❌ Vui lòng cung cấp ID khóa GPG bằng cách thêm GPG_KEY_ID=<id_khóa>"; \
+		exit 1; \
+	fi
+	
+	@MAVEN_REPO=~/.m2/repository/io/github/track-asia
+	@VERSION=$(shell echo $(VERSION_NAME) | cut -d '=' -f 2)
+	@echo "   Phiên bản: $$VERSION"
+	
+	@echo "📋 Kiểm tra khóa GPG $(GPG_KEY_ID)..."
+	@if ! gpg --list-keys $(GPG_KEY_ID) > /dev/null 2>&1; then \
+		echo "❌ Không tìm thấy khóa GPG $(GPG_KEY_ID) trên hệ thống"; \
+		exit 1; \
+	fi
+	
+	@echo ""
+	@echo "📋 Ký các file iOS:"
+	
+	@echo "\n   🔏 Ký các file iosx64..."
+	@FILES=( \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-javadoc.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-metadata.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-sources.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.klib" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.module" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.pom" \
+	)
+	
+	@COUNT_X64=0
+	@TOTAL_X64=0
+	
+	@for file in "$${FILES[@]}"; do \
+		TOTAL_X64=$$((TOTAL_X64+1)); \
+		if [ -f "$$file" ]; then \
+			echo "   Ký file: $$(basename $$file)"; \
+			\
+			md5sum "$$file" | cut -d ' ' -f 1 > "$$file.md5"; \
+			chmod 644 "$$file.md5"; \
+			\
+			sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
+			chmod 644 "$$file.sha1"; \
+			\
+			gpg --batch --yes --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+			\
+			chmod 644 "$$file.asc"; \
+			COUNT_X64=$$((COUNT_X64+1)); \
+		else \
+			echo "   ⚠️ File không tồn tại: $$(basename $$file)"; \
+		fi; \
+	done
+	
+	@echo "\n   🔏 Ký các file iosarm64..."
+	@FILES=( \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION-javadoc.jar" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION-metadata.jar" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION-sources.jar" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION.klib" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION.module" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION.pom" \
+	)
+	
+	@COUNT_ARM64=0
+	@TOTAL_ARM64=0
+	
+	@for file in "$${FILES[@]}"; do \
+		TOTAL_ARM64=$$((TOTAL_ARM64+1)); \
+		if [ -f "$$file" ]; then \
+			echo "   Ký file: $$(basename $$file)"; \
+			\
+			md5sum "$$file" | cut -d ' ' -f 1 > "$$file.md5"; \
+			chmod 644 "$$file.md5"; \
+			\
+			sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
+			chmod 644 "$$file.sha1"; \
+			\
+			gpg --batch --yes --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+			\
+			chmod 644 "$$file.asc"; \
+			COUNT_ARM64=$$((COUNT_ARM64+1)); \
+		else \
+			echo "   ⚠️ File không tồn tại: $$(basename $$file)"; \
+		fi; \
+	done
+	
+	@TOTAL=$$(( TOTAL_X64 + TOTAL_ARM64 ))
+	@COUNT=$$(( COUNT_X64 + COUNT_ARM64 ))
+	
+	@echo ""
+	@echo "📊 Tổng kết:"
+	@echo "  • Tổng số file đã xử lý: $$TOTAL"
+	@echo "  • Số file đã ký: $$COUNT"
+	
+	@if [ $$COUNT -eq 0 ]; then \
+		echo "❌ Không có file iOS nào được ký. Vui lòng chạy 'make run-android-local-publish' trước khi ký."; \
+		exit 1; \
+	else \
+		echo "✅ Đã ký $$COUNT file iOS thành công."; \
+		if [ $$COUNT -lt $$TOTAL ]; then \
+			echo "⚠️ Cảnh báo: Có $$(( TOTAL - COUNT )) file không tồn tại."; \
+		fi; \
+	fi
 
-# Display current version from VERSION file
+# Kiểm tra thiếu chữ ký và tự động ký nếu phát hiện
+.PHONY: check-and-sign
+check-and-sign:
+	@echo "⚠️ DEPRECATED: Hàm này sẽ bị loại bỏ. Hãy sử dụng 'sign-all-artifacts GPG_KEY_ID=YourKeyID' thay thế."
+	@echo "🔍 Kiểm tra các file bị thiếu chữ ký..."
+	@VERSION=$(shell echo $(VERSION_NAME) | cut -d '=' -f 2); \
+	MAVEN_REPO=~/.m2/repository/io/github/track-asia; \
+	GPG_KEY_ID="795690AE"; \
+	\
+	find $$MAVEN_REPO -type f -not -path "*/\.*" | grep -v "\.\(md5\|sha1\|asc\)$$" | while read file; do \
+		if [ ! -f "$$file.asc" ] || [ ! -f "$$file.md5" ] || [ ! -f "$$file.sha1" ]; then \
+			echo "Phát hiện file thiếu chữ ký: $$file"; \
+			\
+			# Tạo MD5 nếu thiếu \
+			if [ ! -f "$$file.md5" ]; then \
+				md5sum "$$file" | cut -d ' ' -f 1 > "$$file.md5"; \
+				echo "  ✓ Đã tạo MD5"; \
+			fi; \
+			\
+			# Tạo SHA1 nếu thiếu \
+			if [ ! -f "$$file.sha1" ]; then \
+				sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
+				echo "  ✓ Đã tạo SHA1"; \
+			fi; \
+			\
+			# Tạo GPG signature nếu thiếu \
+			if [ ! -f "$$file.asc" ]; then \
+				gpg --batch --yes --armor --detach-sign --local-user "$$GPG_KEY_ID" "$$file"; \
+				echo "  ✓ Đã tạo GPG signature"; \
+			fi; \
+		fi; \
+	done
+	@echo "✅ Đã kiểm tra và ký tất cả các file thiếu chữ ký."
+
+# Mục tiêu mới để kiểm tra xác minh chữ ký đã được ký với đúng khóa
+.PHONY: verify-ios-signatures
+verify-ios-signatures:
+	@echo "🔍 Kiểm tra chữ ký của các file iOS..."
+	@MAVEN_REPO=~/.m2/repository/io/github/track-asia; \
+	GPG_KEY_ID="795690AE"; \
+	VERSION=$(shell echo $(VERSION_NAME) | cut -d '=' -f 2); \
+	echo "   Phiên bản: $$VERSION"
+	
+	@echo "📋 Kiểm tra khóa GPG $${GPG_KEY_ID}..."
+	@if ! gpg --list-keys $${GPG_KEY_ID} > /dev/null 2>&1; then \
+		echo "❌ Không tìm thấy khóa GPG $${GPG_KEY_ID} trên hệ thống"; \
+		exit 1; \
+	fi
+	
+	@echo ""
+	@echo "📋 Kiểm tra các file iOS:"
+	
+	@echo "\n   🔍 Xử lý các file iosx64..."
+	@FILES=( \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-javadoc.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-metadata.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-sources.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.klib" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.module" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.pom" \
+	)
+	
+	@TOTAL_X64=0
+	@VALID_X64=0
+	@MISSING_X64=0
+	@INVALID_X64=0
+	
+	@for file in "$${FILES[@]}"; do \
+		TOTAL_X64=$$((TOTAL_X64+1)); \
+		ASC_FILE="$${file}.asc"; \
+		\
+		if [ ! -f "$$file" ]; then \
+			echo "   ❌ File gốc không tồn tại: $$(basename $$file)"; \
+			MISSING_X64=$$((MISSING_X64+1)); \
+			continue; \
+		fi; \
+		\
+		if [ ! -f "$$ASC_FILE" ]; then \
+			echo "   ❌ Không tìm thấy file chữ ký: $$(basename $$ASC_FILE)"; \
+			MISSING_X64=$$((MISSING_X64+1)); \
+			continue; \
+		fi; \
+		\
+		echo "   Kiểm tra chữ ký: $$(basename $$file)"; \
+		VERIFY_OUTPUT=$$(gpg --verify "$$ASC_FILE" "$$file" 2>&1); \
+		\
+		if echo "$$VERIFY_OUTPUT" | grep -q "Good signature"; then \
+			VALID_X64=$$((VALID_X64+1)); \
+			if echo "$$VERIFY_OUTPUT" | grep -q "$${GPG_KEY_ID}"; then \
+				echo "   ✅ Chữ ký hợp lệ và được ký với khóa $${GPG_KEY_ID}"; \
+			else \
+				KEY_USED=$$(echo "$$VERIFY_OUTPUT" | grep -o "key ID [A-Z0-9]*" | awk '{print $$3}'); \
+				echo "   ⚠️ Chữ ký hợp lệ nhưng được ký với khóa KHÁC ($${KEY_USED})"; \
+			fi; \
+		else \
+			echo "   ❌ Chữ ký KHÔNG hợp lệ"; \
+			INVALID_X64=$$((INVALID_X64+1)); \
+		fi; \
+	done
+	
+	@echo "\n   🔍 Xử lý các file iosarm64..."
+	@FILES=( \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION-javadoc.jar" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION-metadata.jar" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION-sources.jar" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION.klib" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION.module" \
+		"$$MAVEN_REPO/navigation-core-iosarm64/$$VERSION/navigation-core-iosarm64-$$VERSION.pom" \
+	)
+	
+	@TOTAL_ARM64=0
+	@VALID_ARM64=0
+	@MISSING_ARM64=0
+	@INVALID_ARM64=0
+	
+	@for file in "$${FILES[@]}"; do \
+		TOTAL_ARM64=$$((TOTAL_ARM64+1)); \
+		ASC_FILE="$${file}.asc"; \
+		\
+		if [ ! -f "$$file" ]; then \
+			echo "   ❌ File gốc không tồn tại: $$(basename $$file)"; \
+			MISSING_ARM64=$$((MISSING_ARM64+1)); \
+			continue; \
+		fi; \
+		\
+		if [ ! -f "$$ASC_FILE" ]; then \
+			echo "   ❌ Không tìm thấy file chữ ký: $$(basename $$ASC_FILE)"; \
+			MISSING_ARM64=$$((MISSING_ARM64+1)); \
+			continue; \
+		fi; \
+		\
+		echo "   Kiểm tra chữ ký: $$(basename $$file)"; \
+		VERIFY_OUTPUT=$$(gpg --verify "$$ASC_FILE" "$$file" 2>&1); \
+		\
+		if echo "$$VERIFY_OUTPUT" | grep -q "Good signature"; then \
+			VALID_ARM64=$$((VALID_ARM64+1)); \
+			if echo "$$VERIFY_OUTPUT" | grep -q "$${GPG_KEY_ID}"; then \
+				echo "   ✅ Chữ ký hợp lệ và được ký với khóa $${GPG_KEY_ID}"; \
+			else \
+				KEY_USED=$$(echo "$$VERIFY_OUTPUT" | grep -o "key ID [A-Z0-9]*" | awk '{print $$3}'); \
+				echo "   ⚠️ Chữ ký hợp lệ nhưng được ký với khóa KHÁC ($${KEY_USED})"; \
+			fi; \
+		else \
+			echo "   ❌ Chữ ký KHÔNG hợp lệ"; \
+			INVALID_ARM64=$$((INVALID_ARM64+1)); \
+		fi; \
+	done
+	
+	@TOTAL=$$((TOTAL_X64 + TOTAL_ARM64))
+	@VALID=$$((VALID_X64 + VALID_ARM64))
+	@MISSING=$$((MISSING_X64 + MISSING_ARM64))
+	@INVALID=$$((INVALID_X64 + INVALID_ARM64))
+	
+	@echo ""
+	@echo "📊 Tổng kết kiểm tra:"
+	@echo "  • Tổng số file: $$TOTAL"
+	@echo "  • Chữ ký hợp lệ: $$VALID"
+	@echo "  • Thiếu file hoặc chữ ký: $$MISSING"
+	@echo "  • Chữ ký không hợp lệ: $$INVALID"
+	
+	@# Kiểm tra trên Maven Central
+	@if curl -s -I "https://repo1.maven.org/maven2/io/github/track-asia/navigation-core-iosx64/$${VERSION}/" >/dev/null 2>&1; then \
+		echo "\n🌐 iOS artifacts đã được xuất bản lên Maven Central với phiên bản $$VERSION"; \
+	else \
+		echo "\n🌐 iOS artifacts chưa được xuất bản lên Maven Central với phiên bản $$VERSION"; \
+	fi
+
+# Thêm mục tiêu để ký các file iOS với sudo để giải quyết vấn đề quyền
+.PHONY: sudo-sign-ios-files
+sudo-sign-ios-files:
+	@echo "🔐 Đang ký các file iOS với quyền sudo..."
+	@VERSION="2.0.1"; \
+	MAVEN_REPO=~/.m2/repository/io/github/track-asia; \
+	GPG_KEY_ID="795690AE"; \
+	\
+	echo "⚠️ Đang thay đổi quyền truy cập..."; \
+	sudo chmod -R 755 $$MAVEN_REPO/navigation-core-iosx64/$$VERSION/; \
+	sudo find $$MAVEN_REPO/navigation-core-iosx64/$$VERSION/ -type f -exec chmod 644 {} \;; \
+	\
+	FILES=( \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-javadoc.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-metadata.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION-sources.jar" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.klib" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.module" \
+		"$$MAVEN_REPO/navigation-core-iosx64/$$VERSION/navigation-core-iosx64-$$VERSION.pom" \
+	); \
+	\
+	for file in "$${FILES[@]}"; do \
+		if [ -f "$$file" ]; then \
+			echo "Đang ký: $$file"; \
+			\
+			# Tạo MD5 \
+			md5sum "$$file" | cut -d ' ' -f 1 > "$$file.md5"; \
+			\
+			# Tạo SHA1 \
+			sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
+			\
+			# Xóa chữ ký cũ nếu có \
+			rm -f "$$file.asc" 2>/dev/null; \
+			\
+			# Tạo GPG signature với sudo \
+			gpg --batch --yes --armor --detach-sign --local-user "$$GPG_KEY_ID" "$$file"; \
+			\
+			# Kiểm tra kết quả \
+			if [ -f "$$file.asc" ]; then \
+				echo "✅ Đã ký thành công: $$file"; \
+				\
+				# Xác minh chữ ký \
+				if gpg --verify "$$file.asc" "$$file" 2>/dev/null; then \
+					echo "  ✓ Chữ ký hợp lệ"; \
+				else \
+					echo "  ❌ Chữ ký không hợp lệ"; \
+				fi; \
+			else \
+				echo "❌ Không thể ký: $$file"; \
+			fi; \
+		else \
+			echo "❌ Không tìm thấy file: $$file"; \
+		fi; \
+	done
+	@echo "✅ Hoàn tất quá trình ký các file iOS với sudo."
+
+# Kiểm tra tất cả các chữ ký đã tạo
+.PHONY: verify-signatures
+verify-signatures:
+	@echo "🔍 Kiểm tra các chữ ký đã tạo..."
+	@MAVEN_REPO=~/.m2/repository/io/github/track-asia; \
+	\
+	# Tìm tất cả các file MD5 \
+	MD5_FILES=$$(find $$MAVEN_REPO -name "*.md5"); \
+	MD5_COUNT=$$(echo "$$MD5_FILES" | grep -c "." || echo 0); \
+	\
+	# Tìm tất cả các file SHA1 \
+	SHA1_FILES=$$(find $$MAVEN_REPO -name "*.sha1"); \
+	SHA1_COUNT=$$(echo "$$SHA1_FILES" | grep -c "." || echo 0); \
+	\
+	# Tìm tất cả các file GPG \
+	GPG_FILES=$$(find $$MAVEN_REPO -name "*.asc"); \
+	GPG_COUNT=$$(echo "$$GPG_FILES" | grep -c "." || echo 0); \
+	\
+	# Kiểm tra các file gốc \
+	ORIG_FILES=$$(find $$MAVEN_REPO -type f \
+		-not -name "*.md5" \
+		-not -name "*.sha1" \
+		-not -name "*.asc" \
+		-not -name "*.sha256" \
+		-not -name "*.sha512" \
+		-not -name "_remote.repositories" \
+		-not -path "*/maven-metadata.xml*" | grep -v -e '\.lastUpdated$$' -e '\.repositories$$'); \
+	ORIG_COUNT=$$(echo "$$ORIG_FILES" | grep -c "." || echo 0); \
+	\
+	# Kiểm tra số lượng chữ ký \
+	echo "📊 Tổng kết file:"; \
+	echo "  • File gốc cần ký: $$ORIG_COUNT"; \
+	echo "  • File MD5: $$MD5_COUNT"; \
+	echo "  • File SHA1: $$SHA1_COUNT"; \
+	echo "  • File GPG: $$GPG_COUNT"; \
+	\
+	if [ $$ORIG_COUNT -eq 0 ]; then \
+		echo "❌ Không tìm thấy file nào để kiểm tra. Hãy chạy 'make run-android-local-publish' trước."; \
+		exit 1; \
+	fi; \
+	\
+	echo ""; \
+	echo "🧪 Kiểm tra tính toàn vẹn chữ ký MD5..."; \
+	\
+	MD5_VALID=0; \
+	MD5_INVALID=0; \
+	MD5_MISSING=0; \
+	\
+	for file in $$ORIG_FILES; do \
+		if [ ! -f "$$file.md5" ]; then \
+			echo "  ❌ Thiếu file MD5: $$(basename $$file)"; \
+			MD5_MISSING=$$((MD5_MISSING+1)); \
+			continue; \
+		fi; \
+		\
+		EXPECTED=$$(cat "$$file.md5"); \
+		ACTUAL=$$(md5sum "$$file" | cut -d ' ' -f 1); \
+		\
+		if [ "$$EXPECTED" = "$$ACTUAL" ]; then \
+			MD5_VALID=$$((MD5_VALID+1)); \
+		else \
+			echo "  ❌ MD5 không khớp: $$(basename $$file)"; \
+			echo "     - Mong đợi: $$EXPECTED"; \
+			echo "     - Thực tế:  $$ACTUAL"; \
+			MD5_INVALID=$$((MD5_INVALID+1)); \
+		fi; \
+	done; \
+	\
+	echo "  • MD5 hợp lệ: $$MD5_VALID"; \
+	echo "  • MD5 không hợp lệ: $$MD5_INVALID"; \
+	echo "  • Thiếu MD5: $$MD5_MISSING"; \
+	\
+	echo ""; \
+	echo "🧪 Kiểm tra tính toàn vẹn chữ ký SHA1..."; \
+	\
+	SHA1_VALID=0; \
+	SHA1_INVALID=0; \
+	SHA1_MISSING=0; \
+	\
+	for file in $$ORIG_FILES; do \
+		if [ ! -f "$$file.sha1" ]; then \
+			echo "  ❌ Thiếu file SHA1: $$(basename $$file)"; \
+			SHA1_MISSING=$$((SHA1_MISSING+1)); \
+			continue; \
+		fi; \
+		\
+		EXPECTED=$$(cat "$$file.sha1"); \
+		ACTUAL=$$(sha1sum "$$file" | cut -d ' ' -f 1); \
+		\
+		if [ "$$EXPECTED" = "$$ACTUAL" ]; then \
+			SHA1_VALID=$$((SHA1_VALID+1)); \
+		else \
+			echo "  ❌ SHA1 không khớp: $$(basename $$file)"; \
+			echo "     - Mong đợi: $$EXPECTED"; \
+			echo "     - Thực tế:  $$ACTUAL"; \
+			SHA1_INVALID=$$((SHA1_INVALID+1)); \
+		fi; \
+	done; \
+	\
+	echo "  • SHA1 hợp lệ: $$SHA1_VALID"; \
+	echo "  • SHA1 không hợp lệ: $$SHA1_INVALID"; \
+	echo "  • Thiếu SHA1: $$SHA1_MISSING"; \
+	\
+	echo ""; \
+	echo "🧪 Kiểm tra tính toàn vẹn chữ ký GPG..."; \
+	\
+	GPG_VALID=0; \
+	GPG_INVALID=0; \
+	GPG_MISSING=0; \
+	\
+	for file in $$ORIG_FILES; do \
+		if [ ! -f "$$file.asc" ]; then \
+			echo "  ❌ Thiếu file GPG: $$(basename $$file)"; \
+			GPG_MISSING=$$((GPG_MISSING+1)); \
+			continue; \
+		fi; \
+		\
+		VERIFY_RESULT=$$(gpg --verify "$$file.asc" "$$file" 2>&1 || echo "Verification failed"); \
+		\
+		if echo "$$VERIFY_RESULT" | grep -q "Good signature"; then \
+			GPG_VALID=$$((GPG_VALID+1)); \
+		else \
+			echo "  ❌ GPG không hợp lệ: $$(basename $$file)"; \
+			GPG_INVALID=$$((GPG_INVALID+1)); \
+		fi; \
+	done; \
+	\
+	echo "  • GPG hợp lệ: $$GPG_VALID"; \
+	echo "  • GPG không hợp lệ: $$GPG_INVALID"; \
+	echo "  • Thiếu GPG: $$GPG_MISSING"; \
+	\
+	echo ""; \
+	echo "📊 Tổng kết kiểm tra:"; \
+	echo "  • Tổng số file gốc: $$ORIG_COUNT"; \
+	echo "  • MD5 hợp lệ: $$MD5_VALID / $$ORIG_COUNT"; \
+	echo "  • SHA1 hợp lệ: $$SHA1_VALID / $$ORIG_COUNT"; \
+	echo "  • GPG hợp lệ: $$GPG_VALID / $$ORIG_COUNT"; \
+	\
+	# Kiểm tra tổng thể \
+	if [ $$MD5_VALID -eq $$ORIG_COUNT ] && [ $$SHA1_VALID -eq $$ORIG_COUNT ] && [ $$GPG_VALID -eq $$ORIG_COUNT ]; then \
+		echo "✅ Tất cả các chữ ký đều hợp lệ."; \
+	else \
+		echo "⚠️ Có một số chữ ký không hợp lệ hoặc bị thiếu:"; \
+		if [ $$MD5_MISSING -gt 0 ] || [ $$MD5_INVALID -gt 0 ]; then \
+			echo "  • MD5: $$MD5_MISSING thiếu, $$MD5_INVALID không hợp lệ"; \
+		fi; \
+		if [ $$SHA1_MISSING -gt 0 ] || [ $$SHA1_INVALID -gt 0 ]; then \
+			echo "  • SHA1: $$SHA1_MISSING thiếu, $$SHA1_INVALID không hợp lệ"; \
+		fi; \
+		if [ $$GPG_MISSING -gt 0 ] || [ $$GPG_INVALID -gt 0 ]; then \
+			echo "  • GPG: $$GPG_MISSING thiếu, $$GPG_INVALID không hợp lệ"; \
+		fi; \
+		\
+		echo ""; \
+		echo "💡 Gợi ý: Chạy 'make sign-all-artifacts GPG_KEY_ID=<your_gpg_key_id>' để ký lại tất cả các file."; \
+	fi
+
+# Show current version from VERSION file
 .PHONY: show-version
 show-version:
-	@echo "Current version from VERSION file: $(VERSION_NAME)"
+	@echo "Current version: $(VERSION_NAME)"
 
 # Set a new version in the VERSION file
 .PHONY: set-version
 set-version:
 	@if [ -z "$(NEW_VERSION)" ]; then \
-		echo "ERROR: NEW_VERSION environment variable is not set"; \
+		echo "❌ Error: NEW_VERSION is required"; \
 		echo "Usage: make set-version NEW_VERSION=x.y.z"; \
 		exit 1; \
-	fi
-	@echo "$(NEW_VERSION)" > VERSION
-	@echo "Version updated to $(NEW_VERSION)"
+	fi; \
+	\
+	echo "🔄 Setting version to $(NEW_VERSION)..."; \
+	echo "$(NEW_VERSION)" > VERSION; \
+	echo "✅ Version updated to $(NEW_VERSION)";
 
-# Check artifact signatures
-.PHONY: verify-signatures
-verify-signatures:
-	@echo "Verifying MD5 signatures..."
-	find ~/.m2/repository/com/trackasia/navigation -name "*.md5" | while read file; do \
-		echo "Verifying $$file..."; \
-		orig_file=$$(echo "$$file" | sed 's/\.md5$$//'); \
-		expected=$$(cat "$$file" | awk '{print $$1}'); \
-		actual=$$(md5sum "$$orig_file" | awk '{print $$1}'); \
-		if [ "$$expected" != "$$actual" ]; then \
-			echo "MD5 verification failed for $$orig_file"; \
-			echo "Expected: $$expected"; \
-			echo "Actual: $$actual"; \
-		fi; \
-	done
+# Quy trình xuất bản trọn gói
+.PHONY: publish-all
+publish-all:
+	@echo "🚀 Executing full publishing workflow..."
 	
-	@echo "Verifying SHA1 signatures..."
-	find ~/.m2/repository/com/trackasia/navigation -name "*.sha1" | while read file; do \
-		echo "Verifying $$file..."; \
-		orig_file=$$(echo "$$file" | sed 's/\.sha1$$//'); \
-		expected=$$(cat "$$file" | awk '{print $$1}'); \
-		actual=$$(shasum "$$orig_file" | awk '{print $$1}'); \
-		if [ "$$expected" != "$$actual" ]; then \
-			echo "SHA1 verification failed for $$orig_file"; \
-			echo "Expected: $$expected"; \
-			echo "Actual: $$actual"; \
-		fi; \
-	done
+	@$(MAKE) run-android-local-publish
+	
+	@echo "📝 Verifying signatures..."
+	@$(MAKE) verify-signatures
+	
+	@echo "📝 Verifying iOS signatures..."
+	@$(MAKE) verify-ios-signatures
+	
+	@echo "✅ All steps completed successfully!"
+	@echo "🎉 Publishing workflow completed successfully!"
 
-# Generate GPG key for signing artifacts (interactive)
-.PHONY: generate-signing-key
-generate-signing-key:
-	@echo "Generating GPG key for signing artifacts..."
-	gpg --full-generate-key
-	@echo "Export the key ID and use it for SIGNING_KEY_ID environment variable"
-	@echo "Run 'gpg --list-secret-keys --keyid-format=long' to see your key ID"
-	@echo "Export the signing key to the project root directory with:"
-	@echo "gpg --export-secret-keys --armor YOUR_KEY_ID > signing-key.gpg"
+# Sửa lại run-android-local-publish để sử dụng hàm mới
+.PHONY: run-android-local-publish
+run-android-local-publish:
+	@echo "Publishing to Maven Local with version $(VERSION_NAME) from VERSION file"
+	@export SIGNING_KEY_ID=795690AE && \
+	export SIGNING_PASSWORD=track-asia && \
+	export SIGNING_SECRET_KEY_RING_FILE=$(shell pwd)/signing-key.gpg && \
+	./gradlew -PversionName=$(VERSION_NAME) publishToMavenLocal -Psigning.keyId=795690AE -Psigning.password=track-asia -Psigning.secretKeyRingFile=$(shell pwd)/signing-key.gpg
+	@echo "Cleaning up metadata..."
+	$(MAKE) cleanup-metadata
+	@echo "Ký tất cả các artifacts..."
+	$(MAKE) sign-all-artifacts GPG_KEY_ID=795690AE
+	@echo "Ký các file iOS..."
+	$(MAKE) sign-ios-files GPG_KEY_ID=795690AE
+	@echo "✅ Hoàn tất xuất bản lên Maven Local, dọn dẹp metadata và ký các artifacts."
 
-# Export GPG key for CI/CD environment
-.PHONY: export-signing-key
-export-signing-key:
-	@if [ -z "$$GPG_KEY_ID" ]; then \
-		echo "ERROR: GPG_KEY_ID environment variable is not set"; \
-		echo "Usage: make export-signing-key GPG_KEY_ID=YOUR_KEY_ID"; \
-		exit 1; \
-	fi
-	gpg --export-secret-keys --armor $$GPG_KEY_ID > signing-key.gpg
-	@echo "Signing key exported to signing-key.gpg"
-	@echo "Set the following environment variables for signing:"
-	@echo "SIGNING_KEY_ID=$$GPG_KEY_ID (last 8 characters)"
-	@echo "SIGNING_PASSWORD=your_gpg_passphrase"
+# Cleanup metadata files after publishing
+.PHONY: cleanup-metadata
+cleanup-metadata:
+	@echo "🧹 Cleaning up metadata files..."
+	find ~/.m2/repository/io/github/track-asia -name "*maven-metadata-local.xml*" -delete
+	find ~/.m2/repository/io/github/track-asia -name "*metadata-local*" -delete
+	@echo "✅ Metadata cleanup completed"
 
-# Help target to display available publishing-related commands
-.PHONY: publish-help
-publish-help:
-	@echo "Available publishing commands:"
-	@echo "  make publish-to-maven-local    - Publish artifacts to Maven Local repository with version from VERSION file"
-	@echo "  make sign-artifacts            - Sign published artifacts with MD5 and SHA1"
-	@echo "  make publish-local-signed      - Publish to Maven Local and sign artifacts"
-	@echo "  make verify-signatures         - Verify MD5 and SHA1 signatures"
-	@echo "  make generate-signing-key      - Generate a new GPG key for signing"
-	@echo "  make export-signing-key        - Export GPG key for CI/CD (requires GPG_KEY_ID)"
+# Thêm vào phần help
+.PHONY: help
+help:
+	@echo "TrackAsia Navigation Android Makefile Commands:"
 	@echo ""
-	@echo "Version management:"
-	@echo "  make show-version              - Display current version from VERSION file"
+	@echo "Publishing commands:"
+	@echo "  make run-android-local-publish    - Publish artifacts to Maven Local repository"
+	@echo "  make cleanup-metadata             - Clean up Maven metadata files after publishing"
+	@echo "  make sign-all-artifacts           - Sign artifacts with MD5, SHA1, and GPG (RECOMMENDED)"
+	@echo "  make sign-ios-files               - Ký riêng các file iOS bị thiếu signature (iosx64, iosarm64)"
+	@echo "  make verify-signatures            - Verify MD5 and SHA1 signatures"
+	@echo "  make verify-ios-signatures        - Kiểm tra chữ ký các file iOS đã ký và so sánh với web"
+	@echo "  make publish-all                  - Quy trình xuất bản đầy đủ: publish, cleanup, sign, verify"
+	@echo "  make show-version                 - Display current version from VERSION file"
 	@echo "  make set-version NEW_VERSION=x.y.z - Set a new version in the VERSION file"
 	@echo ""
-	@echo "Official publishing commands:"
-	@echo "  make run-android-publish       - Publish to Maven Central Staging with version from VERSION file"
-	@echo "  make checksums                 - Generate checksums for libandroid-navigation artifacts"
-	@echo "  make checksums2                - Generate checksums for libandroid-navigation-ui artifacts"
-	@echo ""
-	@echo "For official publication to Maven Central:"
-	@echo "  Set environment variables SIGNING_KEY_ID, SIGNING_PASSWORD,"
-	@echo "  OSSRH_USERNAME, OSSRH_PASSWORD, and SONATYPE_STAGING_PROFILE_ID"
 
 

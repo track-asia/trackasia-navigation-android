@@ -4,7 +4,7 @@ ext {
     trackAsiaDeveloperMail = 'team@track-asia.com'
     trackAsiaDeveloperOrganization = 'TrackAsia'
 
-    navigationArtifactGroupId = 'com.trackasia.navigation'
+    navigationArtifactGroupId = 'io.github.track-asia'
     navigationArtifactTitle = 'TrackAsia Navigation SDK'
     navigationArtifactDescription = 'TrackAsia Navigation build on Kotlin Multiplatform'
     navigationDeveloperOrganizationUrl = 'http://www.track-asia.com'
