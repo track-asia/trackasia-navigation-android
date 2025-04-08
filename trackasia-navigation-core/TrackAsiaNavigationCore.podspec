@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'TrackAsiaNavigationCore'
-    spec.version                  = '0.0.0'
+    spec.version                  = '2.0.1'
     spec.homepage                 = 'https://github.com/trackasia/trackasia-navigation-android/'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''

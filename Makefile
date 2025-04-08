@@ -275,8 +275,6 @@ sign-all-artifacts:
 	fi
 	
 	@echo "🔍 Tìm các file để ký..."
-	@VERSION=$(shell echo $(VERSION_NAME) | cut -d '=' -f 2)
-	@echo "   Phiên bản: $$VERSION"
 	@find ~/.m2/repository/io/github/track-asia -type f > .temp_files.txt
 	@grep -v "\.md5$$" .temp_files.txt | grep -v "\.sha1$$" | grep -v "\.asc$$" | grep -v "maven-metadata" > .temp_files_to_sign.txt
 	@TOTAL_FILES=$$(cat .temp_files_to_sign.txt | wc -l | tr -d ' \n\t')
@@ -300,7 +298,7 @@ sign-all-artifacts:
 		sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
 		chmod 644 "$$file.sha1"; \
 		\
-		gpg --batch --yes --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+		gpg --batch --yes --passphrase="track-asia" --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
 		\
 		chmod 644 "$$file.asc"; \
 	done
@@ -313,7 +311,7 @@ sign-all-artifacts:
 	@rm -f .temp_files.txt .temp_files_to_sign.txt
 	@echo "✅ Hoàn tất quá trình ký."
 
-# Mục tiêu mới để ký tất cả các file iOS
+# Mục tiêu mới để ký các file iOS
 .PHONY: sign-ios-files
 sign-ios-files:
 	@echo "🔏 Ký các file iOS..."
@@ -323,7 +321,7 @@ sign-ios-files:
 	fi
 	
 	@MAVEN_REPO=~/.m2/repository/io/github/track-asia
-	@VERSION=$(shell echo $(VERSION_NAME) | cut -d '=' -f 2)
+	@VERSION="$(VERSION_NAME)"
 	@echo "   Phiên bản: $$VERSION"
 	
 	@echo "📋 Kiểm tra khóa GPG $(GPG_KEY_ID)..."
@@ -359,7 +357,7 @@ sign-ios-files:
 			sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
 			chmod 644 "$$file.sha1"; \
 			\
-			gpg --batch --yes --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+			gpg --batch --yes --passphrase="track-asia" --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
 			\
 			chmod 644 "$$file.asc"; \
 			COUNT_X64=$$((COUNT_X64+1)); \
@@ -392,7 +390,7 @@ sign-ios-files:
 			sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
 			chmod 644 "$$file.sha1"; \
 			\
-			gpg --batch --yes --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+			gpg --batch --yes --passphrase="track-asia" --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
 			\
 			chmod 644 "$$file.asc"; \
 			COUNT_ARM64=$$((COUNT_ARM64+1)); \
@@ -830,6 +828,9 @@ publish-all:
 	@echo "📝 Verifying iOS signatures..."
 	@$(MAKE) verify-ios-signatures
 	
+	@echo "📝 Verifying navigation-ui-android..."
+	@$(MAKE) sign-navigation-ui-android GPG_KEY_ID=795690AE
+	
 	@echo "✅ All steps completed successfully!"
 	@echo "🎉 Publishing workflow completed successfully!"
 
@@ -847,6 +848,8 @@ run-android-local-publish:
 	$(MAKE) sign-all-artifacts GPG_KEY_ID=795690AE
 	@echo "Ký các file iOS..."
 	$(MAKE) sign-ios-files GPG_KEY_ID=795690AE
+	@echo "Ký các file navigation-ui-android..."
+	$(MAKE) sign-navigation-ui-android GPG_KEY_ID=795690AE
 	@echo "✅ Hoàn tất xuất bản lên Maven Local, dọn dẹp metadata và ký các artifacts."
 
 # Cleanup metadata files after publishing
@@ -856,6 +859,93 @@ cleanup-metadata:
 	find ~/.m2/repository/io/github/track-asia -name "*maven-metadata-local.xml*" -delete
 	find ~/.m2/repository/io/github/track-asia -name "*metadata-local*" -delete
 	@echo "✅ Metadata cleanup completed"
+
+
+
+# Mục tiêu mới để ký file AAR của navigation-ui-android
+.PHONY: sign-navigation-ui-android
+sign-navigation-ui-android:
+	@echo "🔏 Ký các file navigation-ui-android..."
+	@if [ -z "$(GPG_KEY_ID)" ]; then \
+		echo "❌ Vui lòng cung cấp ID khóa GPG bằng cách thêm GPG_KEY_ID=<id_khóa>"; \
+		exit 1; \
+	fi
+	
+	@MAVEN_REPO=~/.m2/repository/io/github/track-asia
+	@VERSION="$(VERSION_NAME)"
+	@echo "   Phiên bản: $$VERSION"
+	
+	@echo "📋 Kiểm tra khóa GPG $(GPG_KEY_ID)..."
+	@if ! gpg --list-keys $(GPG_KEY_ID) > /dev/null 2>&1; then \
+		echo "❌ Không tìm thấy khóa GPG $(GPG_KEY_ID) trên hệ thống"; \
+		exit 1; \
+	fi
+	
+	@echo ""
+	@echo "📋 Ký các file navigation-ui-android:"
+	
+	@# Kiểm tra và copy file AAR nếu cần thiết
+	@if [ ! -f "$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION.aar" ]; then \
+		echo "   ⚙️ Sao chép file AAR từ build output..."; \
+		mkdir -p "$$MAVEN_REPO/navigation-ui-android/$$VERSION/"; \
+		cp libandroid-navigation-ui/build/outputs/aar/libandroid-navigation-ui-release.aar "$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION.aar"; \
+		echo "   ✅ Đã sao chép file AAR"; \
+	fi
+	
+	@# Thiết lập POM file nếu cần
+	@if grep -q "<packaging>pom</packaging>" "$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION.pom" 2>/dev/null; then \
+		echo "   ⚙️ Cập nhật file POM sang packaging aar..."; \
+		sed -i '' 's/<packaging>pom<\/packaging>/<packaging>aar<\/packaging>/' "$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION.pom"; \
+		echo "   ✅ Đã cập nhật file POM"; \
+	fi
+	
+	@FILES=( \
+		"$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION.pom" \
+		"$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION.aar" \
+		"$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION-javadoc.jar" \
+		"$$MAVEN_REPO/navigation-ui-android/$$VERSION/navigation-ui-android-$$VERSION-sources.jar" \
+	)
+	
+	@COUNT=0
+	@TOTAL=0
+	
+	@for file in "$${FILES[@]}"; do \
+		TOTAL=$$((TOTAL+1)); \
+		if [ -f "$$file" ]; then \
+			echo "   Ký file: $$(basename $$file)"; \
+			\
+			md5sum "$$file" | cut -d ' ' -f 1 > "$$file.md5"; \
+			chmod 644 "$$file.md5"; \
+			echo "   ✓ Đã tạo MD5: $$(cat $$file.md5)"; \
+			\
+			sha1sum "$$file" | cut -d ' ' -f 1 > "$$file.sha1"; \
+			chmod 644 "$$file.sha1"; \
+			echo "   ✓ Đã tạo SHA1: $$(cat $$file.sha1)"; \
+			\
+			gpg --batch --yes --passphrase="track-asia" --use-agent --local-user $(GPG_KEY_ID) --armor --detach-sign "$$file"; \
+			chmod 644 "$$file.asc"; \
+			echo "   ✓ Đã ký GPG"; \
+			\
+			COUNT=$$((COUNT+1)); \
+		else \
+			echo "   ⚠️ File không tồn tại: $$(basename $$file)"; \
+		fi; \
+	done
+	
+	@echo ""
+	@echo "📊 Tổng kết:"
+	@echo "  • Tổng số file đã xử lý: $$TOTAL"
+	@echo "  • Số file đã ký: $$COUNT"
+	
+	@if [ $$COUNT -eq 0 ]; then \
+		echo "❌ Không có file navigation-ui-android nào được ký. Vui lòng chạy 'make run-android-local-publish' trước khi ký."; \
+		exit 1; \
+	else \
+		echo "✅ Đã ký $$COUNT file navigation-ui-android thành công."; \
+		if [ $$COUNT -lt $$TOTAL ]; then \
+			echo "⚠️ Cảnh báo: Có $$(( TOTAL - COUNT )) file không tồn tại."; \
+		fi; \
+	fi
 
 # Thêm vào phần help
 .PHONY: help
@@ -867,6 +957,7 @@ help:
 	@echo "  make cleanup-metadata             - Clean up Maven metadata files after publishing"
 	@echo "  make sign-all-artifacts           - Sign artifacts with MD5, SHA1, and GPG (RECOMMENDED)"
 	@echo "  make sign-ios-files               - Ký riêng các file iOS bị thiếu signature (iosx64, iosarm64)"
+	@echo "  make sign-navigation-ui-android   - Ký các file navigation-ui-android (aar, pom, javadoc, sources)"
 	@echo "  make verify-signatures            - Verify MD5 and SHA1 signatures"
 	@echo "  make verify-ios-signatures        - Kiểm tra chữ ký các file iOS đã ký và so sánh với web"
 	@echo "  make publish-all                  - Quy trình xuất bản đầy đủ: publish, cleanup, sign, verify"

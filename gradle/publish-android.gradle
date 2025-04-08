@@ -39,14 +39,15 @@ afterEvaluate {
                 version project.ext.versionName
 
                 artifactId "${artifactId.replace("libandroid-", "")}-android"
-
-                artifact tasks.androidJavadocsJar
-                artifact tasks.androidSourcesJar
+                
+                from components.release
 
                 pom {
                     name = project.ext.navigationArtifactTitle
                     description = project.ext.navigationArtifactTitle
                     url = project.ext.navigationArtifactUrl
+                    
+                    packaging = "aar"
 
                     licenses {
                         license {
