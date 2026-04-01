@@ -67,8 +67,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":libandroid-navigation-ui"))
-    implementation(project(":trackasia-navigation-core"))
+//    implementation(project(":libandroid-navigation-ui"))
+//    implementation(project(":trackasia-navigation-core"))
+    implementation("io.github.track-asia:navigation-ui-android:2.0.2")
+    implementation("io.github.track-asia:navigation-core-android:2.0.2")
+    implementation("io.github.track-asia:navigation-core:2.0.2")
+
 
     implementation(libs.trackasia) {
         // Exclude old version of GeoJSON libs
