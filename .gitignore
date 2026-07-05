@@ -18,3 +18,8 @@ build/
 .history/
 deploy-to-maven.sh
 cleanup-metadata.sh
+
+# Secrets & signing (không commit — dùng biến môi trường / CI secrets)
+.env
+signing-key.gpg
+**/src/main/res/values/developer-config.xml
