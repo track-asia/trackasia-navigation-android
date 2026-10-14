@@ -46,71 +46,33 @@ All issues are covered with this SDK.
 If you are looking to include this inside your project, you have to follow the following steps:
 
 ### Gradle
-Step 1. Add it to your root `build.gradle` at the end of repositories:
-```
-  allprojects {
-    repositories {
-      ...
-      maven { url 'https://jitpack.io' }
-    }
-  }
-```
-Step 2. Add the dependency
-```
-  implementation 'com.github.trackasia:trackasia-navigation-android:2.0.0'
+
+#### Stable Release (Maven Central)
+```groovy
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    // Core navigation logic
+    implementation 'io.github.track-asia:navigation-core:2.0.2'
+
+    // Turn-by-turn Navigation UI (Android)
+    implementation 'io.github.track-asia:navigation-ui-android:2.0.2'
+}
 ```
 
-### Maven
-Step 1. Add it to your root `build.gradle` at the end of repositories:
-```
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-```
-Step 2. Add the dependency
-```
-  <dependency>
-	    <groupId>com.github.trackasia</groupId>
-	    <artifactId>trackasia-navigation-android</artifactId>
-	    <version>2.0.0</version>
-	</dependency>
-```
-
-### sbt
-Step 1. Add it in your `build.sbt` at the end of resolvers:
-```
-  resolvers += "jitpack" at "https://jitpack.io"
-```
-Step 2. Add the dependency
-```
-  libraryDependencies += "com.github.trackasia" % "trackasia-navigation-android" % "2.0.0"
-```
-
-### leiningen
-Step 1. Add it in your `project.clj` at the end of repositories:
-```
-  :repositories [["jitpack" "https://jitpack.io"]]
-```
-Step 2. Add the dependency
-```
-  :dependencies [[com.github.trackasia/trackasia-navigation-android "2.0.0"]]	
-```
-
-To run the [sample code](#sample-code) on a device or emulator, include your [Mapbox access token](https://www.mapbox.com/help/define-access-token/) and map tile provider URL in `developer-config.xml` found in the project. 
+> 📚 **Complete Android Guide & Sample Project**: See [TrackAsia Android Document & Samples](https://github.com/track-asia/trackasia-android-document) for complete integration examples with Kotlin DSL and Groovy DSL.
 
 ## Getting Help
 
-- **Have a bug to report?** [Open an issue](https://github.com/track-asia/trackasia-navigation-android/issues). If possible, include the version of TrackAsia Services, a full log, and a project that shows the issue.
-- **Have a feature request?** [Open an issue](https://github.com/track-asia/trackasia-navigation-android/issues/new). Tell us what the feature should do and why you want the feature.
+- **Have a bug to report?** [Open an issue](https://github.com/track-asia/trackasia-navigation-android/issues).
+- **Have a feature request?** [Open an issue](https://github.com/track-asia/trackasia-navigation-android/issues/new).
 
-### <a name="sample-code">Sample code
+### Sample code
 
-We've added one [navigation example](https://github.com/track-asia/trackasia-navigation-android/tree/main/app/src/main/java/com/mapbox/services/android/navigation/testapp/) to this repo's test app. We are planning to add more to help you get started with the SDK and to inspire you.
-
-In order to see the map or calculate a route you need your own Maptile and Direction services.
+We have included navigation examples to help you get started with the SDK. In order to see the map or calculate a route, use the official TrackAsia Style URL (`https://maps.track-asia.com/styles/v2/streets.json?key=public`).
 
 ### Contributing
 
