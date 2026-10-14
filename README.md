@@ -43,7 +43,16 @@ This library is available on Maven Central. To use it, add the following to your
 
 ### Gradle
 
-Step 2. Add the dependency
+#### Stable Release (Maven Central)
+```groovy
+  // Core navigation logic
+  implementation 'io.github.track-asia:navigation-core:2.0.2'
+
+  // Turn-by-turn Navigation UI (Android)
+  implementation 'io.github.track-asia:navigation-ui-android:2.0.2'
+```
+
+#### Kotlin Multiplatform Preview (KMP 5.0.0)
 ```groovy
   // Core KMP library (without UI)
   implementation 'com.trackasia.navigation:navigation-core:5.0.0-pre1'
