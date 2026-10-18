@@ -15,3 +15,7 @@ build/
 
 #MacOS
 .DS_Store
+.history/
+.env
+signing-key.gpg
+cleanup-metadata.sh
